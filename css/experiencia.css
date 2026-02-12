@@ -1,0 +1,180 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    height: 100vh;
+    background: url("../Imagenes/fondo.jpg") center/cover no-repeat;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Overlay oscuro */
+body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 0;
+}
+
+/* TOP BAR */
+.top-bar {
+    position: absolute;
+    width: 100%;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 5;
+}
+
+.volver {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.estado-ar {
+    background: red;
+    padding: 6px 14px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+}
+
+/* CONTENEDOR GENERAL */
+.ar-container {
+    position: relative;
+    z-index: 2;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ================= SCAN SCREEN ================= */
+
+.scan-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.scan-frame {
+    width: 320px;
+    height: 320px;
+    border: 4px solid #00ffc8;
+    border-radius: 25px;
+    margin-bottom: 25px;
+}
+
+.scan-info {
+    text-align: center;
+    max-width: 400px;
+}
+
+.scan-title {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.scan-desc {
+    font-size: 1rem;
+    opacity: 0.85;
+}
+
+.fake-scan-btn {
+    margin-top: 25px;
+    padding: 14px 35px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(90deg, #00c9a7, #007cf0);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.fake-scan-btn:hover {
+    transform: scale(1.05);
+}
+
+/* ================= MODELO ================= */
+
+.hidden {
+    display: none;
+}
+
+.model-screen {
+    text-align: center;
+    width: 100%;
+    max-width: 900px;
+}
+
+.badge {
+    background: #007cf0;
+    padding: 8px 20px;
+    border-radius: 25px;
+    display: inline-block;
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+}
+
+.modelo-3d {
+    width: 260px;
+    margin-bottom: 40px;
+    animation: flotar 3s ease-in-out infinite;
+}
+
+@keyframes flotar {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+}
+
+/* ================= BOTONES ================= */
+
+.bottom-controls {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.control-btn {
+    padding: 16px 35px;
+    font-size: 1rem;
+    border-radius: 18px;
+    border: none;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(12px);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.control-btn:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-3px);
+}
+
+.trivia-btn {
+    padding: 16px 60px;
+    font-size: 1.05rem;
+    border: none;
+    border-radius: 35px;
+    background: linear-gradient(90deg, #a100ff, #ff008c);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.trivia-btn:hover {
+    transform: scale(1.05);
+}

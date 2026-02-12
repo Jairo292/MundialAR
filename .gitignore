@@ -1,0 +1,17 @@
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Configuración de VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Archivos temporales
+*.tmp
+*.swp
+
+# Si algún día usas Node
+node_modules/
+package-lock.json

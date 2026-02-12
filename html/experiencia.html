@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiencia AR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/experiencia.css">
+</head>
+<body>
+
+    <!-- BOTÓN VOLVER -->
+    <div class="top-bar">
+        <a href="index.html" class="volver">← Volver</a>
+        <span class="estado-ar">● AR ACTIVO</span>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="ar-container">
+
+        <!-- PANTALLA ESCANEO -->
+        <div class="scan-screen" id="scanScreen">
+            <div class="scan-frame"></div>
+
+            <div class="scan-info">
+                <p class="scan-title">Apunta la cámara al marcador</p>
+                <p class="scan-desc">
+                    Mantén el dispositivo estable y asegúrate de que el marcador esté bien iluminado
+                </p>
+            </div>
+
+            <button class="fake-scan-btn" onclick="mostrarModelo()">
+                Simular Escaneo
+            </button>
+        </div>
+
+        <!-- PANTALLA MODELO (oculta al inicio) -->
+        <div class="model-screen hidden" id="modelScreen">
+
+            <div class="badge">Copa Mundial 2026</div>
+
+            <!-- Aquí luego irá modelo 3D -->
+            <img src="../Imagenes/pelota.png" alt="Pelota 3D" class="modelo-3d">
+
+            <!-- BOTONES INFERIORES -->
+            <div class="bottom-controls">
+                <button class="control-btn">Animación</button>
+                <button class="control-btn">Info</button>
+                <button class="control-btn">Video</button>
+                <button class="control-btn">Efectos</button>
+            </div>
+
+            <button class="trivia-btn">
+                🎮 Modo Trivia AR
+            </button>
+
+        </div>
+
+    </div>
+
+<script src="../js/experiencia.js"></script>
+</body>
+</html>
