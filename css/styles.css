@@ -115,3 +115,32 @@ small {
 .experiencia-container {
     text-align: center;
 }
+
+/* ===================== */
+/* RESPONSIVE (MOBILE)   */
+/* ===================== */
+
+/* Un poquito de “safe area” para notches */
+.contenido {
+  padding: calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));
+  width: min(92vw, 800px);
+}
+
+/* Tipos fluidos */
+h1 { font-size: clamp(2.2rem, 7vw, 3.5rem); }
+h2 { font-size: clamp(1.2rem, 4.5vw, 2rem); }
+p  { font-size: clamp(0.95rem, 3.6vw, 1.05rem); }
+
+/* Cards: en móvil que no “aprieten” */
+.cards { gap: 12px; }
+.card  { width: min(260px, 90vw); }
+
+/* Botón con ancho cómodo */
+.btn {
+  width: min(360px, 92vw);
+  text-align: center;
+}
+
+/* Evita 100vh raro en mobile browsers */
+.hero { min-height: 100svh; height: auto; }
+

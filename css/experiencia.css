@@ -178,3 +178,88 @@ body::before {
 .trivia-btn:hover {
     transform: scale(1.05);
 }
+
+/* ===================== */
+/* BASE RESPONSIVE FIXES */
+/* ===================== */
+
+/* Mejor comportamiento en móviles (Safari/Chrome) */
+body {
+  min-height: 100svh;
+  height: auto;              /* en vez de 100vh rígido */
+  overflow-x: hidden;        /* evita scroll lateral */
+  overflow-y: auto;          /* permite scroll si algo crece */
+}
+
+/* Safe-area para notch / barra inferior */
+.top-bar {
+  padding: calc(12px + env(safe-area-inset-top)) clamp(12px, 4vw, 30px) 12px;
+}
+
+/* El contenedor no debe forzar 100vh si hay más elementos */
+.ar-container {
+  min-height: 100svh;
+  height: auto;
+  padding: 16px 12px calc(16px + env(safe-area-inset-bottom));
+}
+
+/* ===================== */
+/* SCAN SCREEN MOBILE     */
+/* ===================== */
+
+.scan-frame {
+  width: min(78vw, 320px);
+  height: min(78vw, 320px);
+  border-width: 3px;
+  border-radius: 22px;
+}
+
+.scan-info { max-width: min(92vw, 420px); }
+.scan-title { font-size: clamp(1.05rem, 4.5vw, 1.2rem); }
+.scan-desc  { font-size: clamp(0.95rem, 3.8vw, 1rem); }
+
+/* Botón cómodo en móvil */
+.fake-scan-btn {
+  width: min(360px, 92vw);
+  padding: 14px 18px;
+}
+
+/* ===================== */
+/* MODEL SCREEN MOBILE    */
+/* ===================== */
+
+.model-screen {
+  width: min(900px, 100%);
+  padding: 0 8px;
+}
+
+.badge { font-size: clamp(0.85rem, 3.5vw, 0.95rem); }
+
+.modelo-3d {
+  width: min(62vw, 260px);
+  margin-bottom: 22px;
+}
+
+/* Botones: que se acomoden y no se vean gigantes */
+.bottom-controls {
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.control-btn {
+  width: min(46vw, 200px);   /* 2 por fila en móvil */
+  padding: 14px 14px;
+  font-size: clamp(0.9rem, 3.6vw, 1rem);
+  border-radius: 16px;
+}
+
+.trivia-btn {
+  width: min(420px, 92vw);
+  padding: 16px 18px;
+  font-size: clamp(0.95rem, 3.8vw, 1.05rem);
+}
+
+/* Extra: en pantallas MUY pequeñas, reduce un poco más */
+@media (max-width: 360px) {
+  .control-btn { width: 92vw; } /* 1 por fila si no cabe */
+}
