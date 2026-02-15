@@ -42,21 +42,161 @@
             <img src="../Imagenes/pelota.png" alt="Pelota 3D" class="modelo-3d">
 
             <!-- BOTONES INFERIORES -->
-            <div class="bottom-controls">
-                <button class="control-btn">Animación</button>
-                <button class="control-btn">Info</button>
-                <button class="control-btn">Video</button>
-                <button class="control-btn">Efectos</button>
-            </div>
+         <div class="bottom-controls">
+  <button class="control-btn" id="btnAnim">Animación</button>
+  <button class="control-btn" id="btnInfo">Info</button>
+  <button class="control-btn" id="btnVideo">Video</button>
+  <button class="control-btn" id="btnEfectos">Efectos</button>
+</div>
 
-            <button class="trivia-btn">
-                🎮 Modo Trivia AR
-            </button>
+<button class="trivia-btn" id="btnTrivia">
+  🏆 Modo Trivia AR
+</button>
 
         </div>
 
     </div>
 
 <script src="../js/experiencia.js"></script>
+
+<!-- ===== MODAL: VIDEO ===== -->
+<div class="modal-overlay hidden" id="videoModal" role="dialog" aria-modal="true" aria-label="Video Mundial 2026">
+  <div class="modal">
+    <div class="modal-header modal-header--blue">
+      <div>
+        <h3>Video - Mundial 2026</h3>
+      </div>
+      <button class="modal-close" data-close="videoModal">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="video-wrap">
+        <video id="arVideo" controls playsinline>
+          <source src="../Videos/demo.mp4" type="video/mp4" />
+        </video>
+      </div>
+
+      <h4 class="section-title">Filtros Visuales</h4>
+
+      <div class="chip-row" id="filterRow">
+        <button class="chip chip--active" data-filter="none">Original</button>
+        <button class="chip" data-filter="blur(3px)">Desenfoque</button>
+        <button class="chip" data-filter="contrast(1.2) saturate(1.2)">Color Ajustado</button>
+        <button class="chip" data-filter="url(#thermal)">Térmico</button>
+        <button class="chip" data-filter="pixel">Pixelado</button>
+        <button class="chip" data-filter="pastel">Pastel</button>
+      </div>
+
+      <div class="info-box">
+        <div class="info-box-title">Filtro Activo: <span id="activeFilterLabel">Original</span></div>
+        <div class="info-box-desc">
+          Los filtros visuales permiten personalizar la experiencia de visualización del contenido AR.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: ESTADÍSTICAS ===== -->
+<div class="modal-overlay hidden" id="statsModal" role="dialog" aria-modal="true" aria-label="Estadísticas Mundial 2026">
+  <div class="modal modal--tall">
+    <div class="modal-header modal-header--blue">
+      <div>
+        <h3>Mundial 2026</h3>
+        <p class="modal-sub">Copa Mundial de la FIFA</p>
+      </div>
+      <button class="modal-close" data-close="statsModal">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-ico">📍</div>
+          <div class="stat-val">16 Ciudades</div>
+          <div class="stat-lab">Sedes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-ico">📅</div>
+          <div class="stat-val">11 Jun - 19 Jul</div>
+          <div class="stat-lab">Fecha</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-ico">👥</div>
+          <div class="stat-val">48 Selecciones</div>
+          <div class="stat-lab">Equipos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-ico">🏆</div>
+          <div class="stat-val">104 Encuentros</div>
+          <div class="stat-lab">Partidos</div>
+        </div>
+      </div>
+
+      <h4 class="section-title">Países Anfitriones</h4>
+
+      <div class="host-list">
+        <div class="host-item">
+          <div class="host-badge">US</div>
+          <div class="host-txt">
+            <div class="host-name">Estados Unidos</div>
+            <div class="host-sub">11 ciudades sede</div>
+          </div>
+        </div>
+
+        <div class="host-item">
+          <div class="host-badge">MX</div>
+          <div class="host-txt">
+            <div class="host-name">México</div>
+            <div class="host-sub">3 ciudades sede</div>
+          </div>
+        </div>
+
+        <div class="host-item">
+          <div class="host-badge">CA</div>
+          <div class="host-txt">
+            <div class="host-name">Canadá</div>
+            <div class="host-sub">2 ciudades sede</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: TRIVIA ===== -->
+<div class="modal-overlay hidden" id="triviaModal" role="dialog" aria-modal="true" aria-label="Trivia AR">
+  <div class="modal">
+    <div class="modal-header modal-header--pink">
+      <div class="trivia-top">
+        <div class="trivia-title">🏆 Trivia AR</div>
+        <div class="trivia-score">⭐ <span id="score">0</span> puntos</div>
+      </div>
+
+      <button class="modal-close" data-close="triviaModal">✕</button>
+
+      <div class="trivia-meta">
+        <div class="trivia-step">Pregunta <span id="qIndex">1</span> de <span id="qTotal">3</span></div>
+        <div class="progress">
+          <div class="progress-bar" id="progressBar" style="width:33%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <div class="trivia-body">
+        <div class="trivia-icon">⚽</div>
+        <h4 class="trivia-question" id="questionText">¿Cuántos equipos participarán en el Mundial 2026?</h4>
+
+        <div class="answers" id="answers">
+          <button class="answer">32</button>
+          <button class="answer">40</button>
+          <button class="answer">48</button>
+          <button class="answer">64</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

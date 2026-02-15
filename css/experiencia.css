@@ -13,7 +13,6 @@ body {
     overflow: hidden;
 }
 
-/* Overlay oscuro */
 body::before {
     content: "";
     position: absolute;
@@ -22,7 +21,6 @@ body::before {
     z-index: 0;
 }
 
-/* TOP BAR */
 .top-bar {
     position: absolute;
     width: 100%;
@@ -45,7 +43,6 @@ body::before {
     font-size: 0.9rem;
 }
 
-/* CONTENEDOR GENERAL */
 .ar-container {
     position: relative;
     z-index: 2;
@@ -263,3 +260,227 @@ body {
 @media (max-width: 360px) {
   .control-btn { width: 92vw; } /* 1 por fila si no cabe */
 }
+
+/* ===================== */
+/* MODALS (FIDELIDAD UI) */
+/* ===================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 50;
+}
+
+.modal {
+  width: min(920px, 94vw);
+  max-height: 90svh;
+  background: rgba(15, 22, 35, 0.92);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+  backdrop-filter: blur(12px);
+}
+
+.modal--tall { width: min(520px, 92vw); }
+
+.modal-header {
+  position: relative;
+  padding: 18px 18px 14px;
+  color: #fff;
+}
+
+.modal-header--blue {
+  background: linear-gradient(90deg, #00b894, #0984e3);
+}
+
+.modal-header--pink {
+  background: linear-gradient(90deg, #8e2de2, #ff416c);
+}
+
+.modal-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.modal-sub {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: rgba(255,255,255,0.12);
+  color: white;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 16px 16px 18px;
+  overflow: auto;
+  max-height: calc(90svh - 70px);
+}
+
+.section-title {
+  margin: 14px 0 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  opacity: 0.95;
+}
+
+/* ===== VIDEO MODAL ===== */
+.video-wrap {
+  width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.25);
+}
+
+.video-wrap video {
+  width: 100%;
+  height: auto;
+  display: block;
+  aspect-ratio: 16 / 9;
+}
+
+.chip-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.chip {
+  border: none;
+  cursor: pointer;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  white-space: nowrap;
+  font-weight: 600;
+  min-height: 44px;
+}
+
+.chip--active {
+  background: linear-gradient(90deg, #00b894, #0984e3);
+}
+
+.info-box {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(9, 132, 227, 0.10);
+}
+
+.info-box-title { font-weight: 700; margin-bottom: 6px; }
+.info-box-desc { opacity: 0.9; font-size: 0.95rem; line-height: 1.35; }
+
+/* ===== STATS MODAL ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stat-card {
+  border-radius: 16px;
+  padding: 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.stat-ico { font-size: 1.2rem; margin-bottom: 10px; opacity: 0.95; }
+.stat-val { font-weight: 800; font-size: 1.05rem; }
+.stat-lab { opacity: 0.75; margin-top: 6px; font-size: 0.9rem; }
+
+.host-list { display: grid; gap: 12px; margin-top: 10px; }
+
+.host-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-radius: 16px;
+  padding: 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.host-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  background: rgba(255,255,255,0.08);
+}
+
+.host-name { font-weight: 800; }
+.host-sub { opacity: 0.75; margin-top: 4px; font-size: 0.9rem; }
+
+.trivia-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-right: 50px; 
+}
+
+.trivia-title { font-weight: 900; }
+.trivia-score { font-weight: 800; opacity: 0.95; }
+.trivia-meta { margin-top: 10px; }
+.trivia-step { font-size: 0.9rem; opacity: 0.9; margin-bottom: 8px; }
+
+.progress {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.18);
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f9ca24, #ff416c);
+}
+.trivia-body { text-align: center; padding: 8px 6px 2px; }
+.trivia-icon { font-size: 1.8rem; margin-bottom: 10px; }
+.trivia-question { font-size: 1.1rem; font-weight: 900; margin: 8px 0 14px; }
+
+.answers {
+  display: grid;
+  gap: 10px;
+}
+.answer {
+  border: none;
+  cursor: pointer;
+  padding: 14px 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: white;
+  font-weight: 700;
+  min-height: 48px;
+}
+
+@media (max-width: 420px) {
+  .stats-grid { grid-template-columns: 1fr; }
+}
+
+.video-wrap { position: relative; }
+#pixelCanvas { border-radius: 18px; }
+
+.modal-overlay.hidden { display: none !important; }
