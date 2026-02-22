@@ -5,6 +5,9 @@
     <title>Experiencia AR</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/experiencia.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -19,39 +22,74 @@
 
         <!-- PANTALLA ESCANEO -->
         <div class="scan-screen" id="scanScreen">
-            <div class="scan-frame"></div>
+            <!-- Video de la cámara (oculto inicialmente) -->
+            <video id="cameraStream" class="camera-stream hidden" autoplay playsinline></video>
+            
+            <!-- Marco de escaneo mejorado -->
+            <div class="scan-frame">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                <div class="scan-line"></div>
+                <div class="scan-target">⚽</div>
+            </div>
 
             <div class="scan-info">
-                <p class="scan-title">Apunta la cámara al marcador</p>
+                <div class="scan-icon">📱</div>
+                <p class="scan-title">Escanea un Escudo del Mundial</p>
                 <p class="scan-desc">
-                    Mantén el dispositivo estable y asegúrate de que el marcador esté bien iluminado
+                    Apunta al marcador con buena iluminación
                 </p>
             </div>
 
-            <button class="fake-scan-btn" onclick="mostrarModelo()">
-                Simular Escaneo
+            <button class="fake-scan-btn" onclick="activarCamara()">
+                <span class="btn-icon">📷</span>
+                <span>Activar Cámara</span>
             </button>
         </div>
 
         <!-- PANTALLA MODELO (oculta al inicio) -->
         <div class="model-screen hidden" id="modelScreen">
+            <!-- Video de la cámara de fondo -->
+            <video id="cameraBackground" class="camera-background" autoplay playsinline></video>
 
-            <div class="badge">Copa Mundial 2026</div>
+            <!-- Panel superior -->
+            <div class="model-header">
+                <div class="badge">🏆 Copa Mundial 2026</div>
+            </div>
 
-            <!-- Aquí luego irá modelo 3D -->
-            <img src="../Imagenes/pelota.png" alt="Pelota 3D" class="modelo-3d">
+            <!-- Contenedor del modelo -->
+            <div class="model-container">
+                <div class="model-glow"></div>
+                <img src="../Imagenes/pelota.png" alt="Pelota 3D" class="modelo-3d">
+            </div>
+
+            <!-- BOTÓN DE ANIMACIÓN -->
+            <button class="anim-btn" id="btnAnim">
+                <span class="btn-icon">🎬</span>
+                <span>Animar</span>
+            </button>
 
             <!-- BOTONES INFERIORES -->
-         <div class="bottom-controls">
-  <button class="control-btn" id="btnAnim">Animación</button>
-  <button class="control-btn" id="btnInfo">Info</button>
-  <button class="control-btn" id="btnVideo">Video</button>
-  <button class="control-btn" id="btnEfectos">Efectos</button>
-</div>
+            <div class="bottom-controls">
+                <button class="control-btn" id="btnInfo">
+                    <div class="btn-icon">ℹ️</div>
+                    <div class="btn-label">Info</div>
+                </button>
+                <button class="control-btn" id="btnVideo">
+                    <div class="btn-icon">🎥</div>
+                    <div class="btn-label">Video</div>
+                </button>
+                <button class="control-btn" id="btnEfectos">
+                    <div class="btn-icon">✨</div>
+                    <div class="btn-label">Efectos</div>
+                </button>
+            </div>
 
-<button class="trivia-btn" id="btnTrivia">
-  🏆 Modo Trivia AR
-</button>
+            <button class="trivia-btn" id="btnTrivia">
+                🏆 Modo Trivia AR
+            </button>
 
         </div>
 

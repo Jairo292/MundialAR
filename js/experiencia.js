@@ -1,6 +1,59 @@
+let streamActivo = null;
+
+// Función para activar la cámara
+async function activarCamara() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "environment" }, // Cámara trasera en móviles
+      audio: false
+    });
+
+    streamActivo = stream;
+    
+    // Mostrar el video en la pantalla de escaneo
+    const cameraStream = document.getElementById("cameraStream");
+    cameraStream.srcObject = stream;
+    cameraStream.classList.remove("hidden");
+
+    // Cambiar el botón
+    const btn = document.querySelector(".fake-scan-btn");
+    btn.innerHTML = '<span class="btn-icon">🎯</span><span>Detectar Escudo</span>';
+    btn.onclick = mostrarModelo;
+
+  } catch (error) {
+    console.error("Error al acceder a la cámara:", error);
+    alert("No se pudo acceder a la cámara. Verifica los permisos.");
+  }
+}
+
 function mostrarModelo() {
+  // Transferir el stream a la pantalla del modelo
+  if (streamActivo) {
+    const cameraBackground = document.getElementById("cameraBackground");
+    cameraBackground.srcObject = streamActivo;
+  }
+
   document.getElementById("scanScreen").classList.add("hidden");
   document.getElementById("modelScreen").classList.remove("hidden");
+}
+
+// Función para animar el modelo
+function animarModelo() {
+  const modelo = document.querySelector(".modelo-3d");
+  
+  // Remover la clase si ya existe (para poder repetir la animación)
+  modelo.classList.remove("modelo-animando");
+  
+  // Forzar reflow para reiniciar la animación
+  void modelo.offsetWidth;
+  
+  // Agregar la clase de animación
+  modelo.classList.add("modelo-animando");
+  
+  // Remover la clase después de que termine la animación
+  setTimeout(() => {
+    modelo.classList.remove("modelo-animando");
+  }, 2000);
 }
 
 /* ===== Modal helpers ===== */
@@ -21,6 +74,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnVideo) btnVideo.addEventListener("click", () => openModal("videoModal"));
   if (btnInfo) btnInfo.addEventListener("click", () => openModal("statsModal"));
   if (btnTrivia) btnTrivia.addEventListener("click", () => openModal("triviaModal"));
+  
+  // Botón de animación
+  const btnAnim = document.getElementById("btnAnim");
+  if (btnAnim) btnAnim.addEventListener("click", animarModelo);
 
   // Close buttons
   document.querySelectorAll("[data-close]").forEach((btn) => {
