@@ -407,16 +407,27 @@ body {
     }
 }
 
+/* Más espacio entre descripción y cards (TODAS las pantallas) */
+.descripcion{
+  margin: 30px auto 65px; /* sube el margen inferior */
+}
+
+.cards{
+  margin-top: 14px;       /* separa visualmente las cards del texto */
+}
+
 @media (max-width: 480px) {
     .contenido {
         padding: 30px 15px;
     }
     
     .descripcion {
-        margin: 25px auto 35px;
+          margin: 30px auto 55px;
     }
     
     .cards {
+         margin-top: 10px;   
+
         gap: 12px;
     }
     
@@ -437,4 +448,7 @@ body {
     .btn-arrow {
         font-size: 1.1rem;
     }
+}
+.bottom-controls{
+  max-width: 380px; /* antes 280px */
 }

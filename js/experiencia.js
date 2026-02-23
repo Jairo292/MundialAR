@@ -17,7 +17,7 @@ async function activarCamara() {
 
     // Cambiar el botón
     const btn = document.querySelector(".fake-scan-btn");
-    btn.innerHTML = '<span class="btn-icon">🎯</span><span>Detectar Escudo</span>';
+    btn.innerHTML = '</span><span>Detectar Escudo</span>';
     btn.onclick = mostrarModelo;
 
   } catch (error) {
@@ -67,6 +67,57 @@ function closeModal(id) {
 
 /* ===== Wire buttons ===== */
 document.addEventListener("DOMContentLoaded", () => {
+
+  // ===== Efectos AR (filtros sobre la cámara + opcional sobre el modelo) =====
+const btnEfectos = document.getElementById("btnEfectos");
+const cam = document.getElementById("cameraBackground");
+const modelo = document.querySelector(".modelo-3d");
+
+
+
+const cameraModes = [
+  { cls: "camera-filter-none", label: "Normal" },
+  { cls: "camera-filter-cine", label: "Cine" },
+  { cls: "camera-filter-night", label: "Noche" },
+  { cls: "camera-filter-holo", label: "Holograma" },
+  { cls: "camera-filter-thermal", label: "Térmico" },
+  { cls: "camera-filter-blur", label: "Desenfoque" }
+];
+
+let camModeIndex = 0;
+
+function applyCameraMode(i) {
+  if (!cam) return;
+
+  // Quita todos los modos
+  cameraModes.forEach(m => cam.classList.remove(m.cls));
+
+  // Aplica el nuevo
+  const mode = cameraModes[i];
+  cam.classList.add(mode.cls);
+
+  // Cambia el texto del botón para feedback (opcional, pero se siente pro)
+  const labelEl = btnEfectos?.querySelector(".btn-label");
+  if (labelEl) labelEl.textContent = `Efectos: ${mode.label}`;
+}
+
+if (btnEfectos) {
+  // Estado inicial (por si recargas)
+  applyCameraMode(camModeIndex);
+
+  btnEfectos.addEventListener("click", () => {
+    camModeIndex = (camModeIndex + 1) % cameraModes.length;
+    applyCameraMode(camModeIndex);
+
+    // (Opcional) pequeño punch al modelo para que se note el cambio
+    if (modelo) {
+      modelo.classList.remove("modelo-animando");
+      void modelo.offsetWidth;
+      modelo.classList.add("modelo-animando");
+      setTimeout(() => modelo.classList.remove("modelo-animando"), 800);
+    }
+  });
+}
   const btnVideo = document.getElementById("btnVideo");
   const btnInfo = document.getElementById("btnInfo");
   const btnTrivia = document.getElementById("btnTrivia");

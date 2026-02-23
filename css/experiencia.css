@@ -208,6 +208,10 @@ body::before {
     z-index: 3;
     margin-top: 25px;
     padding: 12px 32px;
+     margin-left: auto;
+  margin-right: auto;
+  justify-content: center; /* centra el contenido dentro */
+  text-align: center;
     font-size: 0.95rem;
     font-weight: 500;
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -419,29 +423,35 @@ body::before {
 }
 
 .control-btn {
-    padding: 0;
-    width: 70px;
-    height: 70px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(10px);
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
+  padding: 0;
+  width: 74px;
+  height: 74px;
 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* importante */
+
+  gap: 6px;
+  text-align: center;      /* importante */
+
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.22);
+
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(12px);
+
+  color: white;
+  cursor: pointer;
+
+  transition: all .25s ease;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+}
 .control-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.35);
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-4px) scale(1.04);
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.35);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
 }
 
 .control-btn:active {
@@ -449,12 +459,14 @@ body::before {
 }
 
 .control-btn .btn-icon {
-    font-size: 1.5rem;
+  font-size: 1.6rem;
+  line-height: 1;
 }
-
 .control-btn .btn-label {
-    font-size: 0.7rem;
-    font-weight: 400;
+  font-size: 0.72rem;
+  font-weight: 600;        /* clave */
+  letter-spacing: .02em;
+  opacity: .92;
 }
 
 .trivia-btn {
@@ -887,3 +899,90 @@ body {
 #pixelCanvas { border-radius: 18px; }
 
 .modal-overlay.hidden { display: none !important; }
+
+
+/* Glow celebración */
+.efecto-glow {
+  filter: drop-shadow(0 0 25px rgba(0,255,200,0.8))
+          drop-shadow(0 0 40px rgba(0,255,200,0.5));
+}
+
+/* Holograma AR */
+.efecto-holograma {
+  filter: hue-rotate(180deg) brightness(1.2) saturate(1.4);
+  opacity: 0.85;
+}
+
+/* Neon estadio */
+.efecto-neon {
+  filter: drop-shadow(0 0 20px #00f0ff)
+          drop-shadow(0 0 50px #ff00ff);
+}
+
+/* ===== EFECTOS AR SOBRE LA CÁMARA ===== */
+.camera-filter-none { filter: none; }
+
+.camera-filter-cine {
+  filter: contrast(1.25) saturate(1.35) brightness(1.05);
+}
+
+.camera-filter-night {
+  filter: brightness(0.75) contrast(1.35) saturate(1.1) hue-rotate(-10deg);
+}
+
+.camera-filter-holo {
+  filter: hue-rotate(180deg) saturate(2.0) contrast(1.2) brightness(1.05);
+}
+
+.camera-filter-thermal {
+  /* Simulación térmica (no es real térmico, pero se ve muy marcado) */
+  filter: hue-rotate(200deg) saturate(3.2) contrast(1.5) brightness(1.15);
+}
+
+.camera-filter-blur {
+  filter: blur(3px) saturate(1.1) contrast(1.05);
+}
+
+/* Tip: para que el video se vea “suave” en móvil */
+.camera-background {
+  transform: translateZ(0);
+}
+
+
+#btnEfectos:hover {
+  transform: scale(1.2);
+}
+
+/* Efectos: botón horizontal (más largo que ancho) */
+#btnEfectos{
+  width: 150px;          /* largo */
+  height: 64px;          /* alto */
+  padding: 0 16px;
+
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  gap: 4px;
+
+  background: linear-gradient(135deg,#ffb347,#ffcc33);
+  color: #1a1a1a;
+  font-weight: 800;
+
+  border: 1px solid rgba(255,255,255,0.25);
+  box-shadow: 0 10px 28px rgba(255,180,50,.35),
+              inset 0 1px 0 rgba(255,255,255,.5);
+
+  transform: none; /* por si quedó el scale viejo */
+}
+
+/* Si usas .btn-label dentro, que se vea bien */
+#btnEfectos .btn-label{
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
