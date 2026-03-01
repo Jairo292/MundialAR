@@ -1,46 +1,183 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Mundial AR 2026</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    
-    <!-- CSS -->
-    <link rel="stylesheet" href="../css/styles.css">
-</head>
-<body>
-
-    <section class="hero">
-        <div class="overlay"></div>
-
-        <div class="contenido">
-            <h1>Mundial AR</h1>
-            <h2>2026</h2>
-
-            <p>
-                Vive una experiencia de Realidad Aumentada única con el Mundial de Fútbol 2026.
-                Interactúa con modelos 3D, estadísticas y contenido exclusivo.
-            </p>
-
-            <div class="cards">
-                <div class="card">Modelos 3D</div>
-                <div class="card">Estadísticas</div>
-                <div class="card">Interactivo</div>
-            </div>
-
-            <a href="experiencia.html" class="btn">
-                ▶ Iniciar Experiencia AR
-            </a>
-
-            <small>Web AR Experience v1.0</small>
-        </div>
-    </section>
-
-    <script src="../js/main.js"></script>
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Mundial AR 2026</title>
+		<link rel="stylesheet" href="styles.css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+		<style>
+			body {
+				min-height: 100vh;
+				background: radial-gradient(circle at 60% 40%, #5e6aff 0%, #3b3b98 60%, #2d235a 100%);
+				font-family: 'Montserrat', 'Roboto', Arial, sans-serif;
+				color: #fff;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			}
+			.main-container {
+				width: 100%;
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			}
+			.title {
+				font-size: 4rem;
+				font-weight: 900;
+				letter-spacing: 2px;
+				text-align: center;
+				margin-bottom: 0.2em;
+				text-shadow: 0 6px 24px #222, 0 1px 0 #fff;
+			}
+			.subtitle {
+				font-size: 2.5rem;
+				font-weight: 700;
+				color: #00ffe7;
+				text-align: center;
+				margin-bottom: 1.2em;
+				letter-spacing: 2px;
+				text-shadow: 0 2px 12px #222;
+			}
+			.desc {
+				font-size: 1.15rem;
+				text-align: center;
+				max-width: 600px;
+				margin: 0 auto 2.5em auto;
+				color: #e0eaff;
+			}
+			.features {
+				display: flex;
+				gap: 2.5em;
+				justify-content: center;
+				margin-bottom: 2.5em;
+				flex-wrap: wrap;
+			}
+			.feature-card {
+				background: rgba(255,255,255,0.07);
+				border-radius: 18px;
+				box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+				padding: 2em 1.5em 1.5em 1.5em;
+				min-width: 180px;
+				max-width: 220px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				transition: transform 0.2s;
+			}
+			.feature-card:hover {
+				transform: translateY(-6px) scale(1.04);
+				box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+			}
+			.feature-icon {
+				font-size: 2.5em;
+				margin-bottom: 0.7em;
+				filter: drop-shadow(0 2px 8px #2222);
+			}
+			.feature-title {
+				font-weight: 700;
+				font-size: 1.1em;
+				margin-bottom: 0.2em;
+			}
+			.feature-desc {
+				font-size: 0.98em;
+				color: #b6eaff;
+				text-align: center;
+			}
+			.cta-btn {
+				margin: 2.5em 0 1.5em 0;
+				padding: 1.1em 3.5em;
+				border-radius: 2em;
+				background: linear-gradient(90deg, #7f53ff 0%, #5ee7df 100%);
+				color: #fff;
+				font-size: 1.25em;
+				font-weight: 700;
+				border: none;
+				box-shadow: 0 6px 24px #2228;
+				cursor: pointer;
+				transition: background 0.2s, transform 0.2s;
+				display: flex;
+				align-items: center;
+				gap: 0.7em;
+			}
+			.cta-btn:hover {
+				background: linear-gradient(90deg, #5ee7df 0%, #7f53ff 100%);
+				transform: translateY(-2px) scale(1.03);
+			}
+			.footer-bar {
+				margin-top: 1.5em;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 1em;
+				font-size: 1em;
+				color: #b6eaff;
+				opacity: 0.95;
+			}
+			.footer-badge {
+				background: #2d235a;
+				color: #00ffe7;
+				border-radius: 1em;
+				padding: 0.3em 1.1em;
+				font-size: 0.95em;
+				font-weight: 700;
+				margin-right: 0.7em;
+			}
+			@media (max-width: 700px) {
+				.main-container {
+					padding: 1.5em 0.5em;
+				}
+				.features {
+					flex-direction: column;
+					gap: 1.5em;
+				}
+				.title {
+					font-size: 2.3rem;
+				}
+				.subtitle {
+					font-size: 1.5rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="main-container">
+			<div class="title">Mundial AR</div>
+			<div class="subtitle">2026</div>
+			<div class="desc">
+				Vive una experiencia de <span style="color:#00ffe7;font-weight:700;">Realidad Aumentada</span> única con el Mundial de Fútbol 2026. Interactúa con modelos 3D, estadísticas y contenido exclusivo.
+			</div>
+			<div class="features">
+				<div class="feature-card">
+					<span class="feature-icon">⚽</span>
+					<div class="feature-title">Modelos 3D</div>
+					<div class="feature-desc">Visualiza en 3D</div>
+				</div>
+				<div class="feature-card">
+					<span class="feature-icon">📊</span>
+					<div class="feature-title">Estadísticas</div>
+					<div class="feature-desc">Datos en tiempo real</div>
+				</div>
+				<div class="feature-card">
+					<span class="feature-icon">🎮</span>
+					<div class="feature-title">Interactivo</div>
+					<div class="feature-desc">Participa activamente</div>
+				</div>
+			</div>
+			<a href="escanear.html" class="cta-btn">
+				<span style="font-size:1.3em;">▶</span> Iniciar Experiencia AR
+			</a>
+			<div class="footer-bar">
+				<span class="footer-badge">Web AR Experience v1.0</span>
+				Powered by MindAR.js
+			</div>
+		</div>
+	</body>
 </html>
