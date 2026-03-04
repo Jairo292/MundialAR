@@ -628,11 +628,11 @@ function registerAnimTargets() {
 // Mapping from targetIndex -> model configuration. Restored scales for Mexico/Japon/Corea
 // paso 2.
 const modelMapping = {
-	0: { type: 'glb', src: 'assets/pelotaMEXICO.glb', position: '0 0 -0.5', scale: '100 100 100', rotateAnim: true }, // México (usando modelo de Uruguay)
-	1: { type: 'glb', src: 'assets/pelotaURUGUAY2.glb', position: '0 0 -0.5', scale: '100 100 100', rotateAnim: true },
-	2: { type: 'glb', src: 'assets/pelotaESPANA.glb', position: '0 0 -0.5', scale: '100 100 100', rotateAnim: true }, 
-	3: { type: 'glb', src: 'assets/pelotaCABOVERDA.glb', position: '0 0 -0.5', scale: '100 100 100', rotateAnim: true }, 
-	4: { type: 'glb', src: 'assets/pelotaARABIASAU.glb', position: '0 0 -0.5', scale: '100 100 100', rotateAnim: true }
+	0: { type: 'glb', src: 'assets/pelotaMEXICO.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }, // México (usando modelo de Uruguay)
+	1: { type: 'glb', src: 'assets/pelotaURUGUAY2.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true },
+	2: { type: 'glb', src: 'assets/pelotaESPANA.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }, 
+	3: { type: 'glb', src: 'assets/pelotaCABOVERDA.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }, 
+	4: { type: 'glb', src: 'assets/pelotaARABIASAU.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }
 };
 
 function createModelNode(cfg, index) {
