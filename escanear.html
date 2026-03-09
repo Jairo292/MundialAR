@@ -166,6 +166,29 @@
           </div>
         </div>
       </div>
+
+      <!-- Botón de ayuda (inferior derecha) -->
+      <button id="help-btn" class="help-button" aria-label="Ayuda">
+        <span class="help-mark">?</span>
+        <span class="help-tooltip">Ayuda / Tutorial</span>
+      </button>
+
+      <!-- Modal Tutorial (pasos) -->
+      <div id="tutorial-modal" class="tutorial-modal" aria-hidden="true">
+        <div class="tutorial-content">
+          <div class="tutorial-header">
+            <h3 class="tutorial-title">Tutorial rápido</h3>
+            <button id="tutorial-close" class="tutorial-close" aria-label="Cerrar">×</button>
+          </div>
+          <img id="tutorial-image" class="tutorial-image" src="assets/Flag_of_Mexico.svg.webp" alt="Paso" />
+          <div id="tutorial-desc" class="tutorial-desc">Descripción del paso.</div>
+          <div class="tutorial-footer">
+            <button id="tutorial-prev" class="tutorial-nav-btn">Anterior</button>
+            <span id="tutorial-step-indicator" class="tutorial-step-indicator">1 / 4</span>
+            <button id="tutorial-next" class="tutorial-nav-btn">Siguiente</button>
+          </div>
+        </div>
+      </div>
     </main>
     <script src="script.js"></script>
     <script>

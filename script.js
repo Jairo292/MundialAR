@@ -168,6 +168,118 @@ document.addEventListener("DOMContentLoaded", () => {
 		triviaClose.addEventListener('click', hideTriviaModal);
 	}
 });
+// ---------- Tutorial / Help button logic ----------
+document.addEventListener('DOMContentLoaded', () => {
+	const helpBtn = document.getElementById('help-btn');
+	const modal = document.getElementById('tutorial-modal');
+	const closeBtn = document.getElementById('tutorial-close');
+	const imgEl = document.getElementById('tutorial-image');
+	const descEl = document.getElementById('tutorial-desc');
+	const prevBtn = document.getElementById('tutorial-prev');
+	const nextBtn = document.getElementById('tutorial-next');
+	const stepIndicator = document.getElementById('tutorial-step-indicator');
+
+	if (!helpBtn || !modal || !imgEl || !descEl || !prevBtn || !nextBtn) return;
+
+	const steps = [
+		{
+			title: 'Paso 1: Iniciar experiencia',
+			img: 'assets/galeria/1.png',
+			desc: 'Para inicicar la experiencia da click al boton de iniciar experiencia en AR.'
+		},
+		{
+			title: 'Paso 2: Dar permisos',
+			img: 'assets/galeria/2.png',
+			desc: 'Dale click a permitir permisos para acceder a la cámara.'
+		},
+		{
+			title: 'Paso 3: Como empezar',
+			img: 'assets/galeria/3.png',
+			desc: 'Para poder mostrar un modelo 3D, simplemente escanea un escudo de alguna selección que juegue en el Mundial 2026.'
+		},
+		{
+			title: 'Paso 4: Interacciónes',
+			img: 'assets/galeria/4.png',
+			desc: 'Una vez el modelo 3D esté visible, puedes usar las funciones de abajo.'
+		},
+		{
+			title: 'Paso 5: Animacion',
+			img: 'assets/galeria/5.png',
+			desc: 'Una vez el modelo 3D esté visible, puedes usar el boton de animacion, que hara que el modelo haga una animacion.'
+		},
+		{
+			title: 'Paso 6: Informacion',
+			img: 'assets/galeria/6.png',
+			desc: 'Una vez el modelo 3D esté visible, puedes usar el boton de informacion, para que se muestre informacion del escudo escaneado.'
+		},
+		{
+			title: 'Paso 7: Video',
+			img: 'assets/galeria/7.png',
+			desc: 'Una vez el modelo 3D esté visible, puedes usar el boton de video para ver algun video relacionado a lo escaneado.'
+		},
+		{
+			title: 'Paso 8: Videopt2',
+			img: 'assets/galeria/8.png',
+			desc: 'Una vez estes en el panel puedes reproducir el video y aplicar algun efecto/filtro en el.'
+		},
+		{
+			title: 'Paso 9: Modo Trivia',
+			img: 'assets/galeria/9.png',
+			desc: 'Una vez el modelo 3D esté visible, puedes usar el boton de trivia para jugar.'
+		},
+		{
+			title: 'Paso 10: Modo Trivia pt2',
+			img: 'assets/galeria/10.png',
+			desc: 'Si estas en el modo trivia puedes responder preguntas sobre el contenido escaneado, 3 preguntas en total.'
+		},
+		{
+			title: 'Paso 11: Efecto',
+			img: 'assets/galeria/11.png',
+			desc: 'Puedes usar el boton de efecto para aplicar filtros en la camara como cine, noche, holograma, termico, desenfoque.'
+		}
+	];
+
+	let current = 0;
+
+	function render() {
+		const s = steps[current];
+		imgEl.src = s.img;
+		imgEl.alt = s.title;
+		descEl.textContent = s.desc;
+		prevBtn.disabled = current === 0;
+		nextBtn.disabled = current === steps.length - 1;
+		prevBtn.classList.toggle('disabled', prevBtn.disabled);
+		nextBtn.classList.toggle('disabled', nextBtn.disabled);
+		stepIndicator.textContent = `${current + 1} / ${steps.length}`;
+	}
+
+	function openTutorial() {
+		modal.classList.add('is-open');
+		modal.setAttribute('aria-hidden', 'false');
+		render();
+	}
+
+	function closeTutorial() {
+		modal.classList.remove('is-open');
+		modal.setAttribute('aria-hidden', 'true');
+	}
+
+	helpBtn.addEventListener('click', openTutorial);
+	closeBtn.addEventListener('click', closeTutorial);
+	prevBtn.addEventListener('click', () => { if (current > 0) { current--; render(); } });
+	nextBtn.addEventListener('click', () => { if (current < steps.length - 1) { current++; render(); } });
+
+	// Close when clicking outside content
+	modal.addEventListener('click', (e) => { if (e.target === modal) closeTutorial(); });
+
+	// Keyboard navigation
+	document.addEventListener('keydown', (e) => {
+		if (!modal.classList.contains('is-open')) return;
+		if (e.key === 'Escape') closeTutorial();
+		if (e.key === 'ArrowLeft') prevBtn.click();
+		if (e.key === 'ArrowRight') nextBtn.click();
+	});
+});
 const scanVideo = document.querySelector(".page-scan .scan-video");
 let animationButton = null;
 let effectsButton = null;

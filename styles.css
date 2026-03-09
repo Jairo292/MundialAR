@@ -1198,6 +1198,81 @@ h1 {
 	pointer-events: auto;
 }
 
+/* ---------- Help button and Tutorial modal styles ---------- */
+.help-button {
+	position: fixed;
+	right: 18px;
+	bottom: 18px;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	background: #bdbdbd;
+	color: #1b1b1b;
+	border: none;
+	display: grid;
+	place-items: center;
+	box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+	cursor: pointer;
+	z-index: 3000;
+	font-weight: 700;
+}
+.help-button:focus { outline: 2px solid #fff3; }
+.help-mark { font-size: 1.05rem; line-height:1; }
+.help-tooltip {
+	position: absolute;
+	right: 56px;
+	bottom: 6px;
+	background: rgba(0,0,0,0.75);
+	color: #fff;
+	padding: 6px 10px;
+	border-radius: 8px;
+	font-size: 12px;
+	white-space: nowrap;
+	opacity: 0;
+	transform: translateY(6px);
+	transition: opacity 0.18s ease, transform 0.18s ease;
+	pointer-events: none;
+}
+.help-button:hover .help-tooltip,
+.help-button:focus .help-tooltip { opacity: 1; transform: translateY(0); }
+
+.tutorial-modal {
+	position: fixed;
+	inset: 0;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0,0,0,0.48);
+	z-index: 4000;
+}
+.tutorial-modal.is-open { display: flex; }
+.tutorial-content {
+	width: 820px;
+	max-width: 98vw;
+	background: linear-gradient(180deg,#ffffff 0%, #f3f7fb 100%);
+	color: #0b0b0b;
+	border-radius: 14px;
+	box-shadow: 0 28px 80px rgba(0,0,0,0.55);
+	overflow: hidden;
+	padding: 22px;
+	text-align: center;
+}
+.tutorial-header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.tutorial-title { font-size: 1.1rem; margin:0; font-weight:700; }
+.tutorial-close { background:transparent; border:none; font-size:20px; cursor:pointer; }
+.tutorial-image { width: 100%; max-height: 420px; object-fit: contain; border-radius:10px; background: #fff; margin: 14px 0; }
+.tutorial-desc { font-size: 1rem; color: #111; padding: 10px 8px 18px 8px; min-height:72px; }
+.tutorial-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.tutorial-nav-btn { padding: 10px 16px; border-radius: 10px; border: none; background: #2d3b65; color: #fff; cursor: pointer; font-weight:700; font-size:0.98rem }
+.tutorial-nav-btn.disabled, .tutorial-nav-btn[disabled] { opacity: 0.45; cursor: default; pointer-events: none; }
+.tutorial-step-indicator { font-size: 0.95rem; color: #333; }
+
+@media (max-width: 520px) {
+	.help-tooltip { display:none; }
+	.help-button { right: 12px; bottom: 12px; width:42px; height:42px; }
+	.tutorial-content { padding: 12px; }
+}
+
 .tray-toggle:checked ~ .tray-handle {
 	bottom: calc(180px + env(safe-area-inset-bottom));
 	background: rgba(8, 12, 8, 0.95);
