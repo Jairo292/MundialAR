@@ -13,7 +13,6 @@ build/
 .env
 .env.*
 # Archivos del sistema
-.DS_Store
 Thumbs.db
 # Configuración de VS Code
 .vscode/
