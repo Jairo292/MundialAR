@@ -308,6 +308,7 @@ const cameraEffects = [
 ];
 let isAnimationRunning = false;
 let activeTargetIndex = null;
+let activeTargetElement = null; // reference to the currently found target element
 
 async function startCamera() {
 	if (!scanVideo || !navigator.mediaDevices?.getUserMedia) {
@@ -356,7 +357,7 @@ function triggerActiveAnimation() {
 		activeAnimModel.removeAttribute("animation");
 		activeAnimModel.setAttribute("rotation", "0 0 0");
 		requestAnimationFrame(() => {
-			activeAnimModel.setAttribute("animation", "property: rotation; to: 0 360 0; dur: 2000; easing: linear");
+			activeAnimModel.setAttribute("animation", "property: rotation; to: 0 360 0; dur: 300; easing: linear; loop: true");
 		});
 	} else {
 		activeAnimModel.removeAttribute("animation-mixer");
@@ -706,6 +707,466 @@ function applyCameraEffect() {
 	}
 }
 
+// --- Model-specific effects (Luces / Partículas / Banners) ---
+function toggleModelEffectsPanel() {
+	let panel = document.getElementById('model-effects-panel');
+	if (!panel) panel = createModelEffectsPanel();
+	const wasOpen = panel.classList.contains('open');
+	panel.classList.toggle('open');
+	// if panel is being closed, save current toggles for this target
+	if (wasOpen && !panel.classList.contains('open')) {
+		saveModelEffectsPanelState(panel, activeTargetElement);
+	}
+	// refresh state to reflect current active target
+	refreshModelEffectsPanel();
+}
+
+function createModelEffectsPanel() {
+	// inject styles
+	if (!document.getElementById('model-effects-style')) {
+		const s = document.createElement('style');
+		s.id = 'model-effects-style';
+		s.textContent = `#model-effects-panel{position:fixed;right:16px;bottom:96px;z-index:140;background:rgba(12,17,22,0.9);color:#fff;padding:12px;border-radius:10px;min-width:220px;box-shadow:0 8px 28px rgba(0,0,0,0.45);font-family:inherit;display:none}#model-effects-panel.open{display:block}#model-effects-panel h4{margin:0 0 8px 0;font-size:13px}#model-effects-panel .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}#model-effects-panel .toggle{width:48px;height:26px;border-radius:18px;background:#2b3942;position:relative;border:none;cursor:pointer}#model-effects-panel .toggle.active{background:#1cc8e7}#model-effects-panel .toggle:after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:4px;left:4px;transition:all .18s}#model-effects-panel .toggle.active:after{left:26px}#model-effects-panel .btn{margin-top:8px;padding:8px 10px;border-radius:8px;background:#1cc8e7;border:none;color:#052;font-weight:700;cursor:pointer}#model-effects-panel .btn.danger{background:#ff6b6b;color:#fff}`;
+		document.head.appendChild(s);
+	}
+
+	const panel = document.createElement('div');
+	panel.id = 'model-effects-panel';
+	panel.innerHTML = `
+		<h4>Efectos del modelo</h4>
+		<div class="row"><div>Colores</div><button id="me-radioactive" class="toggle"></button></div>
+		<div class="row"><div>Partículas</div><button id="me-particles" class="toggle"></button></div>
+		<div class="row"><div>Banners</div><button id="me-banner" class="toggle"></button></div>
+
+		<div style="display:flex;gap:8px;justify-content:space-between"><button id="me-apply" class="btn">Aplicar</button><button id="me-remove" class="btn danger">Remover</button></div>
+	`;
+
+	document.body.appendChild(panel);
+
+	// wire buttons
+	const partsBtn = panel.querySelector('#me-particles');
+	const bannerBtn = panel.querySelector('#me-banner');
+	const radBtn = panel.querySelector('#me-radioactive');
+	const applyBtn = panel.querySelector('#me-apply');
+	const removeBtn = panel.querySelector('#me-remove');
+	partsBtn.addEventListener('click', () => partsBtn.classList.toggle('active'));
+	bannerBtn.addEventListener('click', () => bannerBtn.classList.toggle('active'));
+	if (radBtn) radBtn.addEventListener('click', () => radBtn.classList.toggle('active'));
+
+	applyBtn.addEventListener('click', () => {
+		if (!activeTargetElement) { alert('Escanea un modelo primero.'); return; }
+		const targetRef = activeTargetElement;
+		const opts = {
+			particles: partsBtn.classList.contains('active'),
+			banner: bannerBtn.classList.contains('active'),
+			radioactive: !!(radBtn && radBtn.classList.contains('active'))
+		};
+		applyEffectsToTarget(targetRef, opts);
+		targetRef._savedVfxOptions = { ...opts };
+		// verify applied state and retry if necessary
+		setTimeout(() => verifyAndFixEffects(targetRef, opts), 160);
+	});
+
+	removeBtn.addEventListener('click', () => {
+		if (!activeTargetElement) { alert('Escanea un modelo primero.'); return; }
+		// remove all model VFX (lights removed globally)
+		removeParticlesFromTarget(activeTargetElement);
+		removeBannerFromTarget(activeTargetElement);
+		removeRadioactiveFromTarget(activeTargetElement);
+		// update toggles
+		partsBtn.classList.remove('active'); bannerBtn.classList.remove('active'); if (radBtn) radBtn.classList.remove('active');
+		activeTargetElement._savedVfxOptions = { particles: false, banner: false, radioactive: false };
+	});
+
+	// if there is a saved config for this target, restore toggle states
+	try {
+		if (activeTargetElement && activeTargetElement._savedVfxOptions) {
+			const s = activeTargetElement._savedVfxOptions;
+			partsBtn.classList.toggle('active', !!s.particles);
+			bannerBtn.classList.toggle('active', !!s.banner);
+			if (radBtn) radBtn.classList.toggle('active', !!s.radioactive);
+		}
+	} catch (e) {}
+
+	return panel;
+}
+
+function refreshModelEffectsPanel() {
+	const panel = document.getElementById('model-effects-panel');
+	if (!panel) return;
+	const partsBtn = panel.querySelector('#me-particles');
+	const bannerBtn = panel.querySelector('#me-banner');
+	if (!activeTargetElement) {
+		partsBtn.classList.remove('active'); bannerBtn.classList.remove('active');
+		const radBtn = panel.querySelector('#me-radioactive');
+		if (radBtn) radBtn.classList.remove('active');
+		return;
+	}
+	// prefer actual applied VFX state; fall back to saved config if present
+	const saved = activeTargetElement._savedVfxOptions || {};
+	partsBtn.classList.toggle('active', (!!activeTargetElement._vfxParticles) || !!saved.particles);
+	bannerBtn.classList.toggle('active', (!!activeTargetElement._vfxBanner) || !!saved.banner);
+	const radBtn = panel.querySelector('#me-radioactive');
+	if (radBtn) radBtn.classList.toggle('active', (!!activeTargetElement._vfxRadioactive) || !!saved.radioactive);
+}
+
+function saveModelEffectsPanelState(panel, target) {
+	if (!panel) return;
+	const targetRef = target || activeTargetElement;
+	if (!targetRef) return;
+	try {
+		const partsBtn = panel.querySelector('#me-particles');
+		const bannerBtn = panel.querySelector('#me-banner');
+		const radBtn = panel.querySelector('#me-radioactive');
+		targetRef._savedVfxOptions = {
+			particles: !!(partsBtn && partsBtn.classList.contains('active')),
+			banner: !!(bannerBtn && bannerBtn.classList.contains('active')),
+			radioactive: !!(radBtn && radBtn.classList.contains('active')),
+		};
+	} catch (e) {}
+	// keep saved options attached to the target element
+}
+
+function applyEffectsToTarget(target, opts) {
+	if (!target) return;
+	// lights effect removed/disabled globally; do not add per-target lights
+	if (opts.particles) applyParticlesToTarget(target); else removeParticlesFromTarget(target);
+	if (opts.banner) applyBannerToTarget(target); else removeBannerFromTarget(target);
+	if (opts.radioactive) applyRadioactiveToTarget(target); else removeRadioactiveFromTarget(target);
+}
+
+// verify that requested effects are present on the target; attempt to fix and re-check
+function verifyAndFixEffects(target, opts, attempt = 0) {
+	if (!target) return;
+	const status = {
+		particles: !!target._vfxParticles,
+		banner: !!target._vfxBanner,
+		radioactive: !!target._vfxRadioactive,
+	};
+	const want = {
+		particles: !!opts.particles,
+		banner: !!opts.banner,
+		radioactive: !!opts.radioactive,
+	};
+	let ok = true;
+	Object.keys(want).forEach(k => { if (want[k] !== status[k]) ok = false; });
+	if (ok) {
+		// sync UI toggles with actual state
+		refreshModelEffectsPanel();
+		return true;
+	}
+	if (attempt >= 2) {
+		alert('Algunos efectos no pudieron aplicarse correctamente. Intenta nuevamente.');
+		refreshModelEffectsPanel();
+		return false;
+	}
+	// try to fix mismatches
+	// lights disabled globally: do not add per-target lights
+	if (want.particles && !status.particles) applyParticlesToTarget(target);
+	if (!want.particles && status.particles) removeParticlesFromTarget(target);
+	if (want.banner && !status.banner) applyBannerToTarget(target);
+	if (!want.banner && status.banner) removeBannerFromTarget(target);
+	if (want.radioactive && !status.radioactive) applyRadioactiveToTarget(target);
+	if (!want.radioactive && status.radioactive) removeRadioactiveFromTarget(target);
+	// re-check after a short delay
+	setTimeout(() => verifyAndFixEffects(target, opts, attempt + 1), 220);
+}
+
+function applyLightsToTarget(target) {
+	// Lights effect has been disabled globally; ensure no per-target lights are added.
+	try { removeLightsFromTarget(target); } catch (e) {}
+	return;
+}
+
+function removeLightsFromTarget(target) {
+	if (!target) return;
+	const n = target.querySelector('[data-vfx-light-root]');
+	if (n) n.remove();
+	target._vfxLight = null;
+	// if no ambient light exists in the scene, add a low-intensity default ambient
+	try {
+		const scene = document.querySelector('a-scene');
+		if (scene) {
+			const hasAmbient = !!scene.querySelector('[light][data-vfx-light-default-exclude]') || !!scene.querySelector('a-entity[light]');
+			// more careful: if there are no light entities at all, add a safe ambient
+			const anyLight = scene.querySelector('[light]');
+			if (!anyLight) {
+				const amb = document.createElement('a-entity');
+				// use a stronger default ambient so model doesn't appear too dark after removing lights
+				amb.setAttribute('light', 'type: ambient; color: #ffffff; intensity: 0.45');
+				amb.setAttribute('data-vfx-default-ambient', 'true');
+				scene.appendChild(amb);
+			}
+		}
+	} catch (e) {}
+}
+
+function applyParticlesToTarget(target) {
+	if (!target || target.querySelector('[data-vfx-particles]')) return;
+	const root = document.createElement('a-entity');
+	root.setAttribute('data-vfx-particles', 'true');
+	root.setAttribute('position', '0 0 0');
+	// fireworks/explosion: particles shoot out in random directions from model center
+	const count = 48; // number of spark particles
+	const colorDefault = '#ffffff';
+	const colorRadio = '#53ff6a';
+	const useRadio = !!target._vfxRadioactive;
+	const baseColor = useRadio ? (target._vfxRadioactiveColor || colorRadio) : colorDefault;
+	for (let i = 0; i < count; i++) {
+		const s = document.createElement('a-sphere');
+		// random direction on a sphere
+		const theta = Math.random() * Math.PI * 2;
+		const phi = Math.acos(2 * Math.random() - 1);
+		const r = 0.9 + Math.random() * 1.2; // explosion radius
+		const tx = (r * Math.sin(phi) * Math.cos(theta)).toFixed(3);
+		const ty = (r * Math.cos(phi) + 0.2).toFixed(3); // bias slightly upward
+		const tz = (r * Math.sin(phi) * Math.sin(theta)).toFixed(3);
+		const startY = 0.08 + Math.random() * 0.05; // start near model center
+		const baseRadius = 0.01 + Math.random() * 0.018;
+		s.setAttribute('radius', baseRadius.toFixed(4));
+		s.setAttribute('position', `0 ${startY.toFixed(3)} 0`);
+		s.setAttribute('material', `color: ${baseColor}; emissive: ${baseColor}; emissiveIntensity: 1.8; opacity: 0.98; shader: standard`);
+		// glow
+		const glow = document.createElement('a-sphere');
+		glow.setAttribute('radius', (baseRadius * 2.2).toFixed(4));
+		glow.setAttribute('position', `0 ${startY.toFixed(3)} 0`);
+		glow.setAttribute('material', `color: ${baseColor}; emissive: ${baseColor}; emissiveIntensity: 1.1; opacity: 0.18; shader: flat`);
+		glow.setAttribute('class', 'vfx-particle-glow');
+		const dur = 700 + Math.floor(Math.random() * 900);
+		const delay = Math.floor(Math.random() * 900);
+		// animate outwards
+		s.setAttribute('animation__burst', `property: position; from: 0 ${startY.toFixed(3)} 0; to: ${tx} ${ty} ${tz}; dur: ${dur}; easing: easeOutCubic; loop: true; delay: ${delay}`);
+		s.setAttribute('animation__fade', `property: material.opacity; from: 0.95; to: 0.0; dur: ${dur}; loop: true; delay: ${delay}`);
+		s.setAttribute('animation__scale', `property: scale; from: 0.6 1 0.6; to: 0.2 0.2 0.2; dur: ${dur}; loop: true; delay: ${delay}`);
+		// glow follows same motion but fades more
+		glow.setAttribute('animation__burst', `property: position; from: 0 ${startY.toFixed(3)} 0; to: ${tx} ${ty} ${tz}; dur: ${dur}; easing: easeOutCubic; loop: true; delay: ${delay}`);
+		glow.setAttribute('animation__fade', `property: material.opacity; from: 0.18; to: 0.0; dur: ${dur}; loop: true; delay: ${delay}`);
+		root.appendChild(glow);
+		root.appendChild(s);
+	}
+	target.appendChild(root);
+	target._vfxParticles = root;
+}
+
+function setParticlesColorForTarget(target, color, radioactiveOn) {
+	if (!target || !target._vfxParticles) return;
+	const parts = target._vfxParticles.querySelectorAll('a-sphere');
+	parts.forEach((p) => {
+		try {
+			if (p.classList.contains('vfx-particle-glow')) {
+				if (radioactiveOn) {
+					p.setAttribute('material', `color: ${color}; emissive: ${color}; emissiveIntensity: 1.1; opacity: 0.18; shader: flat`);
+				} else {
+					p.setAttribute('material', 'color: #ffffff; emissive: #ffffff; emissiveIntensity: 1.1; opacity: 0.18; shader: flat');
+				}
+			} else {
+				if (radioactiveOn) {
+					p.setAttribute('material', `color: ${color}; emissive: ${color}; emissiveIntensity: 1.8; opacity: 0.99; shader: standard`);
+				} else {
+					p.setAttribute('material', 'color: #ffffff; emissive: #ffffff; emissiveIntensity: 1.8; opacity: 0.99; shader: standard');
+				}
+			}
+		} catch (e) {}
+	});
+}
+
+function removeParticlesFromTarget(target) {
+	if (!target) return;
+	const n = target.querySelector('[data-vfx-particles]');
+	if (n) n.remove();
+	target._vfxParticles = null;
+}
+
+function applyBannerToTarget(target) {
+	if (!target || target.querySelector('[data-vfx-banner]')) return;
+	const banner = document.createElement('a-plane');
+	// make banner larger so text is readable
+	banner.setAttribute('width', '1.05'); banner.setAttribute('height', '0.26');
+	banner.setAttribute('material', 'color: #1cc8e7; opacity: 0.95; side: double');
+	banner.setAttribute('position', '0 1.02 0'); banner.setAttribute('rotation', '-22 0 0');
+	banner.setAttribute('data-vfx-banner', 'true');
+	// try to detect texture name from the model to display on the banner
+	let textureName = 'Modelo';
+	try {
+		const modelNode = target._modelAdded;
+		if (modelNode && modelNode.getObject3D) {
+			const obj = modelNode.getObject3D('mesh') || modelNode.getObject3D('model') || modelNode.object3D;
+			if (obj) {
+				let found = false;
+				obj.traverse((node) => {
+					if (found) return;
+					if (node.isMesh && node.material) {
+						const mats = Array.isArray(node.material) ? node.material : [node.material];
+						for (let m of mats) {
+							const map = m.map;
+							if (map) {
+								if (map.name) { textureName = map.name; found = true; break; }
+								if (map.image && map.image.src) {
+									try { textureName = map.image.src.split('/').pop().split('?')[0]; } catch(e) {}
+									found = true; break;
+								}
+							}
+						}
+					}
+				});
+			}
+		}
+	} catch (e) { /* ignore */ }
+
+	const text = document.createElement('a-entity');
+	// larger text area and center alignment; show detected texture name
+	text.setAttribute('text', `value: ${textureName}; align: center; color: #002; width: 2.2; wrapCount: 24;`);
+	text.setAttribute('position', '0 0 0.02');
+	// slight floating animation to draw attention
+	text.setAttribute('animation__float', 'property: position; to: 0 0.02 0.02; dur: 1800; easing: easeInOutSine; loop: true; dir: alternate');
+	banner.appendChild(text);
+	target.appendChild(banner);
+	target._vfxBanner = banner;
+}
+
+// --- Colores effect: dynamic emissive + soft particle corona ---
+function applyRadioactiveToTarget(target) {
+	if (!target || target._vfxRadioactive) return;
+	target._vfxRadioactiveColor = '#53ff6a';
+	// Add emissive override to model meshes
+	const modelNode = target._modelAdded;
+	const animatedMats = [];
+	if (modelNode && modelNode.getObject3D) {
+		const obj = modelNode.getObject3D('mesh') || modelNode.getObject3D('model') || modelNode.object3D;
+		if (obj) {
+			obj.traverse((node) => {
+				if (node.isMesh && node.material) {
+					const mats = Array.isArray(node.material) ? node.material : [node.material];
+					mats.forEach((m) => {
+						try {
+							if (m.emissive) {
+								m.userData = m.userData || {};
+								// store previous emissive for restore
+								if (m.userData._savedEmissive === undefined) {
+									m.userData._savedEmissive = m.emissive ? m.emissive.clone() : new THREE.Color(0x000000);
+									m.userData._savedEmissiveIntensity = m.emissiveIntensity || 0;
+								}
+								m.emissive = new THREE.Color('#53ff6a');
+								m.emissiveIntensity = 1.6;
+								m.userData._vfxSeed = Math.random() * Math.PI * 2;
+								m.userData._vfxHueSeed = Math.random();
+								animatedMats.push(m);
+								m.needsUpdate = true;
+							}
+						} catch (e) { /* ignore if materials incompatible */ }
+					});
+				}
+			});
+		}
+	}
+	if (animatedMats.length) {
+		// animate emissive color + intensity to create random color cycling
+		target._vfxRadioactiveMats = animatedMats;
+		if (target._vfxRadioactiveInterval) clearInterval(target._vfxRadioactiveInterval);
+		target._vfxRadioactiveInterval = setInterval(() => {
+			const t = performance.now() * 0.001;
+			const hue = (t * 0.16) % 1;
+			const dynamicColor = new THREE.Color().setHSL(hue, 0.95, 0.55);
+			const hexColor = `#${dynamicColor.getHexString()}`;
+			target._vfxRadioactiveColor = hexColor;
+			target._vfxRadioactiveMats.forEach((m) => {
+				try {
+					const seed = m.userData && m.userData._vfxSeed ? m.userData._vfxSeed : 0;
+					const hueSeed = m.userData && m.userData._vfxHueSeed ? m.userData._vfxHueSeed : 0;
+					m.emissive = new THREE.Color().setHSL((hue + hueSeed * 0.15) % 1, 0.95, 0.52);
+					m.emissiveIntensity = 1.0 + 0.6 * Math.sin(t * 2.0 + seed);
+					m.needsUpdate = true;
+				} catch (e) {}
+			});
+			// update corona rings with current color
+			if (target._vfxRadioactiveCoronaNodes) {
+				target._vfxRadioactiveCoronaNodes.forEach((p, idx) => {
+					try {
+						const op = (0.06 + idx * 0.012).toFixed(3);
+						p.setAttribute('material', `color: ${hexColor}; opacity: ${op}; shader: flat; side: double`);
+					} catch (e) {}
+				});
+			}
+			// update dripping particles color too (if present)
+			setParticlesColorForTarget(target, hexColor, true);
+		}, 80);
+	}
+
+	// Add soft green corona using small planes/sprites
+	const corona = document.createElement('a-entity');
+	corona.setAttribute('data-vfx-radioactive', 'true');
+	corona.setAttribute('position', '0 0.28 0');
+	for (let i = 0; i < 6; i++) {
+		const p = document.createElement('a-circle');
+		const s = 0.22 + i * 0.02;
+		p.setAttribute('radius', s.toFixed(3));
+		p.setAttribute('material', 'color: #53ff6a; opacity: 0.12; shader: flat; side: double');
+		p.setAttribute('rotation', '-90 0 0');
+		p.setAttribute('position', `0 ${(-0.02 + i*0.01).toFixed(3)} ${(-0.02 - i*0.01).toFixed(3)}`);
+		// subtle, out-of-sync animations to create a liquid/acido look
+		const dur = 1400 + i * 220;
+		p.setAttribute('animation__scale', `property: scale; to: 1.06 1.06 1; dur: ${dur}; easing: easeInOutSine; loop: true; dir: alternate`);
+		p.setAttribute('animation__pos', `property: position; to: 0 ${(-0.01 + i*0.012).toFixed(3)} ${(-0.015 - i*0.015).toFixed(3)}; dur: ${dur * 1.1}; easing: easeInOutSine; loop: true; dir: alternate`);
+		p.setAttribute('animation__opacity', `property: material.opacity; to: ${(0.02 + i*0.01).toFixed(3)}; dur: ${dur * 0.9}; easing: easeInOutSine; loop: true; dir: alternate`);
+		p.setAttribute('animation__rot', `property: rotation; to: -90 ${ (i%2?12:-12) } 0; dur: ${dur*1.4}; easing: linear; loop: true`);
+		corona.appendChild(p);
+	}
+	target.appendChild(corona);
+	target._vfxRadioactive = corona;
+	target._vfxRadioactiveCoronaNodes = Array.from(corona.querySelectorAll('a-circle'));
+	// if particles are already present, update their color with current radioactive color
+	try {
+		setParticlesColorForTarget(target, target._vfxRadioactiveColor || '#53ff6a', true);
+	} catch(e) {}
+}
+
+function removeRadioactiveFromTarget(target) {
+	if (!target) return;
+	const n = target.querySelector('[data-vfx-radioactive]'); if (n) n.remove(); target._vfxRadioactive = null;
+	// clear any animation timers
+	if (target._vfxRadioactiveInterval) {
+		clearInterval(target._vfxRadioactiveInterval);
+		target._vfxRadioactiveInterval = null;
+	}
+	if (target._vfxRadioactiveMats) {
+		target._vfxRadioactiveMats = null;
+	}
+	if (target._vfxRadioactiveCoronaNodes) {
+		target._vfxRadioactiveCoronaNodes = null;
+	}
+	target._vfxRadioactiveColor = null;
+	// if particles are present, revert their color to white
+	try {
+		setParticlesColorForTarget(target, '#ffffff', false);
+	} catch(e) {}
+	// restore materials
+	const modelNode = target._modelAdded;
+	if (modelNode && modelNode.getObject3D) {
+		const obj = modelNode.getObject3D('mesh') || modelNode.getObject3D('model') || modelNode.object3D;
+		if (obj) {
+			obj.traverse((node) => {
+				if (node.isMesh && node.material) {
+					const mats = Array.isArray(node.material) ? node.material : [node.material];
+					mats.forEach((m) => {
+						try {
+							if (m.userData && m.userData._savedEmissive !== undefined) {
+								m.emissive = m.userData._savedEmissive.clone();
+								m.emissiveIntensity = m.userData._savedEmissiveIntensity || 0;
+								delete m.userData._savedEmissive;
+								delete m.userData._savedEmissiveIntensity;
+								m.needsUpdate = true;
+							}
+						} catch (e) { /* ignore */ }
+					});
+				}
+			});
+		}
+	}
+}
+
+function removeBannerFromTarget(target) { if (!target) return; const n = target.querySelector('[data-vfx-banner]'); if (n) n.remove(); target._vfxBanner = null; }
+
+
 function registerAnimTargets() {
 	const animTargets = document.querySelectorAll("[data-anim-model]");
 	animTargets.forEach((target) => {
@@ -739,12 +1200,14 @@ function registerAnimTargets() {
 
 // Mapping from targetIndex -> model configuration. Restored scales for Mexico/Japon/Corea
 // paso 2.
+// Use a single base GLB and swap textures per target.
+const baseModelSrc = 'assets/pelotaURUGUAY2.glb';
 const modelMapping = {
-	0: { type: 'glb', src: 'assets/pelotaMEXICO.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }, // México (usando modelo de Uruguay)
-	1: { type: 'glb', src: 'assets/pelotaURUGUAY2.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true },
-	2: { type: 'glb', src: 'assets/pelotaESPANA.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }, 
-	3: { type: 'glb', src: 'assets/pelotaCABOVERDA.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }, 
-	4: { type: 'glb', src: 'assets/pelotaARABIASAU.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }
+	0: { position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true, texture: 'assets/MEX.PNG' }, // México
+	1: { position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true, texture: 'assets/URU.png' }, // Uruguay
+	2: { position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true, texture: 'assets/ESP.png' }, // España
+	3: { position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true, texture: 'assets/CABO.png' }, // Cabo Verde
+	4: { position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true, texture: 'assets/ARABIA.jpg' } // Arabia Saudita
 };
 
 function createModelNode(cfg, index) {
@@ -755,13 +1218,39 @@ function createModelNode(cfg, index) {
 		if (cfg.mtl) node.setAttribute('mtl', cfg.mtl);
 	} else {
 		node = document.createElement('a-gltf-model');
-		node.setAttribute('src', cfg.src);
+		// Use cfg.src if provided, otherwise fallback to the shared baseModelSrc
+		node.setAttribute('src', cfg.src || baseModelSrc);
 	}
 	node.setAttribute('position', cfg.position || '0 0 -0.5');
 	node.setAttribute('scale', cfg.scale || '0.2 0.2 0.2');
 	if (cfg.rotation) node.setAttribute('rotation', cfg.rotation);
 	node.setAttribute('id', `model-${index}`);
 	return node;
+}
+
+function applyTextureToModel(el, textureUrl) {
+	if (!window.THREE || !textureUrl) return;
+	try {
+		const loader = new THREE.TextureLoader();
+		loader.load(textureUrl, (tex) => {
+			const obj = el.getObject3D('mesh') || el.getObject3D('model') || el.object3D;
+			if (!obj) return;
+			obj.traverse((node) => {
+				if (node.isMesh && node.material) {
+					if (Array.isArray(node.material)) {
+						node.material.forEach((m) => { m.map = tex; m.needsUpdate = true; });
+					} else {
+						node.material.map = tex;
+						node.material.needsUpdate = true;
+					}
+				}
+			});
+		}, undefined, (err) => {
+			console.warn('Error cargando textura:', textureUrl, err);
+		});
+	} catch (e) {
+		console.warn('applyTextureToModel error', e);
+	}
 }
 
 function registerDynamicTargets() {
@@ -790,9 +1279,14 @@ function registerDynamicTargets() {
 			// Ensure the animation system knows which model is currently active
 			// so the Animacion button works per-model. Also set anim flag if present.
 			activeAnimModel = modelNode;
+			activeTargetElement = t;
 			activeTargetIndex = idx;
 			updateVideoButtonState();
 			modelNode.addEventListener('model-loaded', () => {
+				// Apply custom texture for this target (if provided)
+				if (cfg.texture) {
+					applyTextureToModel(modelNode, cfg.texture);
+				}
 				if (visualEffectsEnabled) {
 					removeVisualEffectFromTarget(t);
 					applyVisualEffectToTarget(t);
@@ -807,6 +1301,20 @@ function registerDynamicTargets() {
 			if (t._vfxAdded) {
 				removeVisualEffectFromTarget(t);
 			}
+			// remove any model-specific VFX when target is lost
+			removeLightsFromTarget(t);
+			removeParticlesFromTarget(t);
+			removeBannerFromTarget(t);
+			// If the lost target was the active one, close the model effects panel to avoid stale UI
+			try {
+				const panel = document.getElementById('model-effects-panel');
+				if (panel) {
+					// save panel state to the target before removing
+					saveModelEffectsPanelState(panel, t);
+					panel.remove();
+				}
+			} catch (e) {}
+
 			if (t._modelAdded) {
 				if (activeAnimModel === t._modelAdded) {
 					activeAnimModel = null;
@@ -818,6 +1326,7 @@ function registerDynamicTargets() {
 				}
 				if (activeTargetIndex === idx) {
 					activeTargetIndex = null;
+								if (activeTargetElement === t) activeTargetElement = null;
 				}
 				t.removeChild(t._modelAdded);
 				t._modelAdded = null;
@@ -901,6 +1410,16 @@ document.addEventListener("DOMContentLoaded", () => {
 		effectsButton.addEventListener("click", toggleVisualEffects);
 		updateVisualEffectsButton();
 		applyCameraEffect(); // Aplica el efecto inicial (Normal)
+	}
+	const modelEffectsBtn = document.querySelector('#model-effects-btn');
+	if (modelEffectsBtn) {
+		modelEffectsBtn.addEventListener('click', () => {
+			if (!activeTargetElement) {
+				alert('Escanea un modelo primero.');
+				return;
+			}
+			toggleModelEffectsPanel();
+		});
 	}
 	dataButton = document.querySelector("#data-btn");
 	dataModal = document.querySelector("#data-modal");
