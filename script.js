@@ -1198,16 +1198,14 @@ function registerAnimTargets() {
 	});
 }
 
-// Mapping from targetIndex -> model configuration. Restored scales for Mexico/Japon/Corea
-// paso 2.
-// Use a single base GLB and swap textures per target.
-const baseModelSrc = 'assets/pelotaURUGUAY2.glb';
+// Mapping from targetIndex -> model configuration. Each target now uses its own .glb
+// file stored inside the `assets` folder instead of sharing a base model.
 const modelMapping = {
-	0: { position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true, texture: 'assets/MEX.PNG' }, // México
-	1: { position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true, texture: 'assets/URU.png' }, // Uruguay
-	2: { position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true, texture: 'assets/ESP.png' }, // España
-	3: { position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true, texture: 'assets/CABO.png' }, // Cabo Verde
-	4: { position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true, texture: 'assets/ARABIA.jpg' } // Arabia Saudita
+	0: { src: 'assets/pelotaMEXICO.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }, // México
+	1: { src: 'assets/pelotaURUGUAY2.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }, // Uruguay
+	2: { src: 'assets/pelotaESPANA.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }, // España
+	3: { src: 'assets/pelotaCABOVERDA.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }, // Cabo Verde
+	4: { src: 'assets/pelotaARABIASAU.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true } // Arabia Saudita
 };
 
 function createModelNode(cfg, index) {
@@ -1218,8 +1216,8 @@ function createModelNode(cfg, index) {
 		if (cfg.mtl) node.setAttribute('mtl', cfg.mtl);
 	} else {
 		node = document.createElement('a-gltf-model');
-		// Use cfg.src if provided, otherwise fallback to the shared baseModelSrc
-		node.setAttribute('src', cfg.src || baseModelSrc);
+		// Use cfg.src if provided
+		if (cfg.src) node.setAttribute('src', cfg.src);
 	}
 	node.setAttribute('position', cfg.position || '0 0 -0.5');
 	node.setAttribute('scale', cfg.scale || '0.2 0.2 0.2');
