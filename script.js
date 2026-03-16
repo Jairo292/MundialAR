@@ -734,7 +734,7 @@ function createModelEffectsPanel() {
 	panel.id = 'model-effects-panel';
 	panel.innerHTML = `
 		<h4>Efectos del modelo</h4>
-		<div class="row"><div>Colores</div><button id="me-radioactive" class="toggle"></button></div>
+		<div class="row"><div>Luces</div><button id="me-radioactive" class="toggle"></button></div>
 		<div class="row"><div>Partículas</div><button id="me-particles" class="toggle"></button></div>
 		<div class="row"><div>Banners</div><button id="me-banner" class="toggle"></button></div>
 
@@ -985,37 +985,42 @@ function applyBannerToTarget(target) {
 	banner.setAttribute('material', 'color: #1cc8e7; opacity: 0.95; side: double');
 	banner.setAttribute('position', '0 1.02 0'); banner.setAttribute('rotation', '-22 0 0');
 	banner.setAttribute('data-vfx-banner', 'true');
-	// try to detect texture name from the model to display on the banner
-	let textureName = 'Modelo';
-	try {
-		const modelNode = target._modelAdded;
-		if (modelNode && modelNode.getObject3D) {
-			const obj = modelNode.getObject3D('mesh') || modelNode.getObject3D('model') || modelNode.object3D;
-			if (obj) {
-				let found = false;
-				obj.traverse((node) => {
-					if (found) return;
-					if (node.isMesh && node.material) {
-						const mats = Array.isArray(node.material) ? node.material : [node.material];
-						for (let m of mats) {
-							const map = m.map;
-							if (map) {
-								if (map.name) { textureName = map.name; found = true; break; }
-								if (map.image && map.image.src) {
-									try { textureName = map.image.src.split('/').pop().split('?')[0]; } catch(e) {}
-									found = true; break;
+	// Prefer the human-readable model name (set on targetFound from modelMapping)
+	let bannerLabel = (target._modelName || '').toString().trim();
+	if (!bannerLabel) {
+		// Fallback: try to detect texture name from the model
+		let textureName = 'Modelo';
+		try {
+			const modelNode = target._modelAdded;
+			if (modelNode && modelNode.getObject3D) {
+				const obj = modelNode.getObject3D('mesh') || modelNode.getObject3D('model') || modelNode.object3D;
+				if (obj) {
+					let found = false;
+					obj.traverse((node) => {
+						if (found) return;
+						if (node.isMesh && node.material) {
+							const mats = Array.isArray(node.material) ? node.material : [node.material];
+							for (let m of mats) {
+								const map = m.map;
+								if (map) {
+									if (map.name) { textureName = map.name; found = true; break; }
+									if (map.image && map.image.src) {
+										try { textureName = map.image.src.split('/').pop().split('?')[0]; } catch(e) {}
+										found = true; break;
+									}
 								}
 							}
 						}
-					}
-				});
+					});
+				}
 			}
-		}
-	} catch (e) { /* ignore */ }
+		} catch (e) { /* ignore */ }
+		bannerLabel = textureName;
+	}
 
 	const text = document.createElement('a-entity');
-	// larger text area and center alignment; show detected texture name
-	text.setAttribute('text', `value: ${textureName}; align: center; color: #002; width: 2.2; wrapCount: 24;`);
+	// larger text area and center alignment
+	text.setAttribute('text', `value: ${bannerLabel}; align: center; color: #002; width: 2.2; wrapCount: 24;`);
 	text.setAttribute('position', '0 0 0.02');
 	// slight floating animation to draw attention
 	text.setAttribute('animation__float', 'property: position; to: 0 0.02 0.02; dur: 1800; easing: easeInOutSine; loop: true; dir: alternate');
@@ -1201,11 +1206,11 @@ function registerAnimTargets() {
 // Mapping from targetIndex -> model configuration. Each target now uses its own .glb
 // file stored inside the `assets` folder instead of sharing a base model.
 const modelMapping = {
-	0: { src: 'assets/pelotaMEXICO.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }, // México
-	1: { src: 'assets/pelotaURUGUAY2.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }, // Uruguay
-	2: { src: 'assets/pelotaESPANA.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }, // España
-	3: { src: 'assets/pelotaCABOVERDA.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }, // Cabo Verde
-	4: { src: 'assets/pelotaARABIASAU.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true } // Arabia Saudita
+	0: { name: 'México', src: 'assets/pelotaMEXICO.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true },
+	1: { name: 'Uruguay', src: 'assets/pelotaURUGUAY2.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true },
+	2: { name: 'España', src: 'assets/pelotaESPANA.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true },
+	3: { name: 'Cabo Verde', src: 'assets/pelotaCABOVERDA.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true },
+	4: { name: 'Arabia Saudita', src: 'assets/pelotaARABIASAU.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }
 };
 
 function createModelNode(cfg, index) {
@@ -1263,6 +1268,7 @@ function registerDynamicTargets() {
 			if (t._modelAdded) return;
 			const cfg = modelMapping[idx];
 			if (!cfg) return;
+			t._modelName = (cfg.name || '').toString().trim();
 			const modelNode = createModelNode(cfg, idx);
 			t.appendChild(modelNode);
 			t._modelAdded = modelNode;
