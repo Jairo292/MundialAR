@@ -1423,7 +1423,7 @@ function buildModelMapping(countries) {
 			src: `assets/pelota${token}.glb`,
 			fallbackSrc: defaultFallbackSrc,
 			position: '0 0 -0.5',
-			scale: '150 150 150',
+			scale: '80 80 80',
 			rotateAnim: true,
 		};
 		const override = overridesByName[countryName] || {};
