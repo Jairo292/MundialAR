@@ -386,28 +386,150 @@ function triggerActiveAnimation() {
 	}
 }
 //paso 3
+// Orden de países según el orden de imágenes compiladas en `assets/targets.mind`.
+// Importante: el índice aquí DEBE coincidir con el targetIndex en MindAR.
+// Se mantienen primero los 5 países existentes para no romper el set actual.
+const targetCountries = [
+	'México',
+	'Uruguay',
+	'España',
+	'Cabo Verde',
+	'Arabia Saudita',
+	'Corea del Sur',
+	'Sudafrica',
+	'Canada',
+	'Suiza',
+	'Qatar',
+	'Brasil',
+	'Marruecos',
+	'Escocia',
+	'Haiti',
+	'Estados Unidos',
+	'Australia',
+	'Paraguay',
+	'Alemania',
+	'Ecuador',
+	'Costa de Marfil',
+	'Curazao',
+	'Holanda',
+	'Japón',
+	'Tunez',
+	'Bélgica',
+	'Iran',
+	'Egipto',
+	'Nueva Zelanda',
+	'Francia',
+	'Senegal',
+	'Noruega',
+	'Argentina',
+	'Austria',
+	'Argelia',
+	'Jordania',
+	'Portugal',
+	'Colombia',
+	'Uzbekistan',
+	'Inglaterra',
+	'Croacia',
+	'Panama',
+	'Ghana'
+];
+
+// Metadatos básicos para generar la descripción de Información por país.
+// Nota: mantenemos el texto sin estadísticas específicas para evitar datos incorrectos.
+const countryMetaByToken = {
+	MEXICO: { confed: 'CONCACAF', extra: 'País anfitrión del Mundial 2026.' },
+	COREADELSUR: { confed: 'AFC' },
+	SUDAFRICA: { confed: 'CAF' },
+	CANADA: { confed: 'CONCACAF', extra: 'País anfitrión del Mundial 2026.' },
+	SUIZA: { confed: 'UEFA' },
+	QATAR: { confed: 'AFC' },
+	BRASIL: { confed: 'CONMEBOL' },
+	MARRUECOS: { confed: 'CAF' },
+	ESCOCIA: { confed: 'UEFA' },
+	HAITI: { confed: 'CONCACAF' },
+	ESTADOSUNIDOS: { confed: 'CONCACAF', extra: 'País anfitrión del Mundial 2026.' },
+	AUSTRALIA: { confed: 'AFC' },
+	PARAGUAY: { confed: 'CONMEBOL' },
+	ALEMANIA: { confed: 'UEFA' },
+	ECUADOR: { confed: 'CONMEBOL' },
+	COSTADEMARFIL: { confed: 'CAF' },
+	CURAZAO: { confed: 'CONCACAF' },
+	HOLANDA: { confed: 'UEFA' },
+	JAPON: { confed: 'AFC' },
+	TUNEZ: { confed: 'CAF' },
+	BELGICA: { confed: 'UEFA' },
+	IRAN: { confed: 'AFC' },
+	EGIPTO: { confed: 'CAF' },
+	NUEVAZELANDA: { confed: 'OFC' },
+	ESPANA: { confed: 'UEFA' },
+	URUGUAY: { confed: 'CONMEBOL' },
+	ARABIASAUDITA: { confed: 'AFC' },
+	CABOVERDE: { confed: 'CAF' },
+	FRANCIA: { confed: 'UEFA' },
+	SENEGAL: { confed: 'CAF' },
+	NORUEGA: { confed: 'UEFA' },
+	ARGENTINA: { confed: 'CONMEBOL' },
+	AUSTRIA: { confed: 'UEFA' },
+	ARGELIA: { confed: 'CAF' },
+	JORDANIA: { confed: 'AFC' },
+	PORTUGAL: { confed: 'UEFA' },
+	COLOMBIA: { confed: 'CONMEBOL' },
+	UZBEKISTAN: { confed: 'AFC' },
+	INGLATERRA: { confed: 'UEFA' },
+	CROACIA: { confed: 'UEFA' },
+	PANAMA: { confed: 'CONCACAF' },
+	GHANA: { confed: 'CAF' },
+};
+
+function buildTeamInfoText(countryName) {
+	const token = normalizeCountryToken(countryName);
+	const meta = (token && countryMetaByToken[token]) ? countryMetaByToken[token] : null;
+	const confedText = meta && meta.confed ? `Compite en ${meta.confed}. ` : '';
+	const extraText = meta && meta.extra ? `${meta.extra} ` : '';
+	return `La selección nacional de ${countryName} representa a ${countryName} en el fútbol internacional. ${confedText}${extraText}Escanea el escudo para ver su modelo 3D.`
+		.replace(/\s+/g, ' ')
+		.trim();
+}
+
 const teamData = {
        0: {
 	       name: "México",
-	       text: "La selección nacional de México es una de las más tradicionales de la CONCACAF y anfitriona de la Copa Mundial en 1970, 1986 y 2026. Ha ganado 11 Copas Oro y es reconocida por su afición y su historia en el fútbol internacional. ¡Escanea el escudo para ver el modelo 3D!",
+	       text: buildTeamInfoText("México"),
        },
 	   1: {
 	       name: "Uruguay",
-	       text: "La selección nacional de Uruguay es una de las más tradicionales de la CONCACAF y anfitriona de la Copa Mundial en 1970, 1986 y 2026. Ha ganado 11 Copas Oro y es reconocida por su afición y su historia en el fútbol internacional. ¡Escanea el escudo para ver el modelo 3D!",
+	       text: buildTeamInfoText("Uruguay"),
        },
 	   2: {
 	       name: "España",
-	       text: "La selección nacional de España es una de las más tradicionales de la CONCACAF y anfitriona de la Copa Mundial en 1970, 1986 y 2026. Ha ganado 11 Copas Oro y es reconocida por su afición y su historia en el fútbol internacional. ¡Escanea el escudo para ver el modelo 3D!",
+	       text: buildTeamInfoText("España"),
        },
 	   3: {
 	       name: "Cabo Verde",
-	       text: "La selección nacional de Cabo Verde es una de las más tradicionales de la CONCACAF y anfitriona de la Copa Mundial en 1970, 1986 y 2026. Ha ganado 11 Copas Oro y es reconocida por su afición y su historia en el fútbol internacional. ¡Escanea el escudo para ver el modelo 3D!",
+	       text: buildTeamInfoText("Cabo Verde"),
        },
 	   4: {
 	       name: "Arabia Saudita",
-	       text: "La selección nacional de Arabia Saudita es una de las más tradicionales de la CONCACAF y anfitriona de la Copa Mundial en 1970, 1986 y 2026. Ha ganado 11 Copas Oro y es reconocida por su afición y su historia en el fútbol internacional. ¡Escanea el escudo para ver el modelo 3D!",
+	       text: buildTeamInfoText("Arabia Saudita"),
        },
 };
+
+// Completa automáticamente teamData para todos los países configurados.
+// (Puedes reemplazar el texto más adelante con información real.)
+targetCountries.forEach((countryName, idx) => {
+	if (!teamData[idx]) {
+		teamData[idx] = {
+			name: countryName,
+			text: buildTeamInfoText(countryName),
+		};
+	} else if (!teamData[idx].name) {
+		teamData[idx].name = countryName;
+	}
+	// Si existía un texto placeholder o vacío, lo reemplaza por el generado.
+	if (!teamData[idx].text || /pr[oó]ximamente/i.test(teamData[idx].text)) {
+		teamData[idx].text = buildTeamInfoText(countryName);
+	}
+});
 
 //paso 4
 const teamVideos = {
@@ -437,6 +559,20 @@ const teamVideos = {
 	       caption: "Video de la selección de Arabia Saudita...",
        }
 };
+
+// Completa automáticamente teamVideos para todos los países configurados.
+// Por defecto no hay video (file: null). Cuando agregues un mp4, rellena `file`.
+targetCountries.forEach((countryName, idx) => {
+	if (!teamVideos[idx]) {
+		teamVideos[idx] = {
+			name: countryName,
+			file: null,
+			caption: "",
+		};
+	} else if (!teamVideos[idx].name) {
+		teamVideos[idx].name = countryName;
+	}
+});
 
 function showDataModal() {
 	if (!dataModal || !dataTitleEl) return;
@@ -503,7 +639,8 @@ function updateVideoButtonState() {
 	if (!videoButton) {
 		return;
 	}
-	const hasVideo = activeTargetIndex !== null && !!teamVideos[activeTargetIndex];
+	const info = activeTargetIndex !== null ? teamVideos[activeTargetIndex] : null;
+	const hasVideo = !!(info && info.file);
 	videoButton.setAttribute("aria-disabled", hasVideo ? "false" : "true");
 }
 
@@ -977,6 +1114,58 @@ function removeParticlesFromTarget(target) {
 	target._vfxParticles = null;
 }
 
+// Abreviaturas (FIFA/ISO) para mostrar en el banner según el país escaneado.
+// La clave está normalizada igual que `normalizeCountryToken()` (sin acentos, sin espacios, en mayúsculas).
+const countryAbbrByToken = {
+	MEXICO: 'MEX',
+	COREADELSUR: 'KOR',
+	SUDAFRICA: 'RSA',
+	CANADA: 'CAN',
+	SUIZA: 'SUI',
+	QATAR: 'QAT',
+	BRASIL: 'BRA',
+	MARRUECOS: 'MAR',
+	ESCOCIA: 'SCO',
+	HAITI: 'HAI',
+	ESTADOSUNIDOS: 'USA',
+	AUSTRALIA: 'AUS',
+	PARAGUAY: 'PAR',
+	ALEMANIA: 'GER',
+	ECUADOR: 'ECU',
+	COSTADEMARFIL: 'CIV',
+	CURAZAO: 'CUW',
+	HOLANDA: 'NED',
+	JAPON: 'JPN',
+	TUNEZ: 'TUN',
+	BELGICA: 'BEL',
+	IRAN: 'IRN',
+	EGIPTO: 'EGY',
+	NUEVAZELANDA: 'NZL',
+	ESPANA: 'ESP',
+	URUGUAY: 'URU',
+	ARABIASAUDITA: 'KSA',
+	CABOVERDE: 'CPV',
+	FRANCIA: 'FRA',
+	SENEGAL: 'SEN',
+	NORUEGA: 'NOR',
+	ARGENTINA: 'ARG',
+	AUSTRIA: 'AUT',
+	ARGELIA: 'ALG',
+	JORDANIA: 'JOR',
+	PORTUGAL: 'POR',
+	COLOMBIA: 'COL',
+	UZBEKISTAN: 'UZB',
+	INGLATERRA: 'ENG',
+	CROACIA: 'CRO',
+	PANAMA: 'PAN',
+	GHANA: 'GHA',
+};
+
+function getCountryAbbr(countryName) {
+	const token = normalizeCountryToken(countryName);
+	return token ? (countryAbbrByToken[token] || null) : null;
+}
+
 function applyBannerToTarget(target) {
 	if (!target || target.querySelector('[data-vfx-banner]')) return;
 	const banner = document.createElement('a-plane');
@@ -987,6 +1176,9 @@ function applyBannerToTarget(target) {
 	banner.setAttribute('data-vfx-banner', 'true');
 	// Prefer the human-readable model name (set on targetFound from modelMapping)
 	let bannerLabel = (target._modelName || '').toString().trim();
+	// If we have an abbreviation for this country, use it.
+	const abbr = bannerLabel ? getCountryAbbr(bannerLabel) : null;
+	if (abbr) bannerLabel = abbr;
 	if (!bannerLabel) {
 		// Fallback: try to detect texture name from the model
 		let textureName = 'Modelo';
@@ -1203,15 +1395,46 @@ function registerAnimTargets() {
 	});
 }
 
-// Mapping from targetIndex -> model configuration. Each target now uses its own .glb
-// file stored inside the `assets` folder instead of sharing a base model.
-const modelMapping = {
-	0: { name: 'México', src: 'assets/pelotaMEXICO.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true },
-	1: { name: 'Uruguay', src: 'assets/pelotaURUGUAY2.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true },
-	2: { name: 'España', src: 'assets/pelotaESPANA.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true },
-	3: { name: 'Cabo Verde', src: 'assets/pelotaCABOVERDA.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true },
-	4: { name: 'Arabia Saudita', src: 'assets/pelotaARABIASAU.glb', position: '0 0 -0.5', scale: '150 150 150', rotateAnim: true }
-};
+function normalizeCountryToken(name) {
+	return (name || '')
+		.toString()
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.toUpperCase()
+		.replace(/[^A-Z0-9]/g, '');
+}
+
+function buildModelMapping(countries) {
+	// Overrides para modelos existentes con nombre de archivo diferente al esquema `pelota{TOKEN}.glb`
+	const overridesByName = {
+		'Uruguay': { src: 'assets/pelotaURUGUAY2.glb' },
+		'Cabo Verde': { src: 'assets/pelotaCABOVERDA.glb' },
+		'Arabia Saudita': { src: 'assets/pelotaARABIASAU.glb' },
+	};
+
+	// Fallback temporal: si el modelo del país no existe todavía, usa Uruguay.
+	const defaultFallbackSrc = 'assets/pelotaURUGUAY2.glb';
+
+	const mapping = {};
+	(countries || []).forEach((countryName, idx) => {
+		const token = normalizeCountryToken(countryName);
+		const baseCfg = {
+			name: countryName,
+			src: `assets/pelota${token}.glb`,
+			fallbackSrc: defaultFallbackSrc,
+			position: '0 0 -0.5',
+			scale: '150 150 150',
+			rotateAnim: true,
+		};
+		const override = overridesByName[countryName] || {};
+		mapping[idx] = { ...baseCfg, ...override };
+	});
+	return mapping;
+}
+
+// Mapping from targetIndex -> model configuration. Each target uses its own .glb
+// file stored inside the `assets` folder.
+const modelMapping = buildModelMapping(targetCountries);
 
 function createModelNode(cfg, index) {
 	let node;
@@ -1223,6 +1446,18 @@ function createModelNode(cfg, index) {
 		node = document.createElement('a-gltf-model');
 		// Use cfg.src if provided
 		if (cfg.src) node.setAttribute('src', cfg.src);
+		// If model fails to load (missing file), swap to fallback once.
+		if (cfg.fallbackSrc) {
+			let didFallback = false;
+			node.addEventListener('model-error', () => {
+				if (didFallback) return;
+				didFallback = true;
+				try {
+					console.warn('Modelo no encontrado/carga fallida. Usando fallback:', cfg.src, '->', cfg.fallbackSrc);
+				} catch (e) {}
+				node.setAttribute('src', cfg.fallbackSrc);
+			});
+		}
 	}
 	node.setAttribute('position', cfg.position || '0 0 -0.5');
 	node.setAttribute('scale', cfg.scale || '0.2 0.2 0.2');
