@@ -481,6 +481,129 @@ const countryMetaByToken = {
 	GHANA: { confed: 'CAF' },
 };
 
+// ---------- Trivia: autogenerar para todos los equipos ----------
+// Mantiene preguntas personalizadas existentes en `triviaQuestions` (ej. México y España)
+// y completa el resto con preguntas seguras basadas en datos internos (confederación / anfitrión / uso de la app).
+const TRIVIA_CONFEDS = ['AFC', 'CAF', 'CONCACAF', 'CONMEBOL', 'UEFA', 'OFC'];
+
+function seededRng(seed) {
+	let s = (seed >>> 0) || 1;
+	return () => {
+		// LCG simple (determinista)
+		s = (s * 1664525 + 1013904223) >>> 0;
+		return s / 0x100000000;
+	};
+}
+
+function seededShuffle(arr, seed) {
+	const a = arr.slice();
+	const rnd = seededRng(seed);
+	for (let i = a.length - 1; i > 0; i--) {
+		const j = Math.floor(rnd() * (i + 1));
+		[a[i], a[j]] = [a[j], a[i]];
+	}
+	return a;
+}
+
+function buildConfedOptions(correct, seed) {
+	const wrong = TRIVIA_CONFEDS.filter((c) => c !== correct);
+	const pick = seededShuffle(wrong, seed).slice(0, 3);
+	return seededShuffle([correct, ...pick], seed + 17);
+}
+
+function isHostCountry(countryName) {
+	const token = normalizeCountryToken(countryName);
+	const meta = token ? countryMetaByToken[token] : null;
+	return !!(meta && meta.extra && /anfitri[oó]n/i.test(meta.extra));
+}
+
+function buildDefaultTriviaForCountry(countryName, idx) {
+	const token = normalizeCountryToken(countryName);
+	const meta = token ? countryMetaByToken[token] : null;
+	const confed = meta && meta.confed ? meta.confed : null;
+	const host = isHostCountry(countryName);
+
+	const q1Options = confed
+		? buildConfedOptions(confed, 1000 + idx)
+		: ['AFC', 'CAF', 'CONCACAF', 'UEFA'];
+	const q1Answer = confed ? q1Options.indexOf(confed) : 0;
+
+	return [
+		{
+			q: `¿En qué confederación compite ${countryName}?`,
+			options: q1Options,
+			answer: q1Answer,
+		},
+		{
+			q: `¿${countryName} es país anfitrión del Mundial 2026?`,
+			options: ['Sí', 'No'],
+			answer: host ? 0 : 1,
+		},
+		{
+			q: `En esta app, ¿qué debes hacer para ver el contenido AR de ${countryName}?`,
+			options: [
+				'Escanear el escudo',
+				'Escribir el nombre del país',
+				'Tomar una foto y subirla',
+				'Activar el modo VR',
+			],
+			answer: 0,
+		},
+	];
+}
+
+function ensureTriviaForAllTargets() {
+	if (!Array.isArray(targetCountries) || targetCountries.length === 0) return;
+
+	// 1) Aplica overrides si existen (definidos en trivia-bank.js)
+	try {
+		const overrides = window.triviaOverrides;
+		if (overrides) {
+			const byIndex = overrides.byIndex || {};
+			const byToken = overrides.byToken || {};
+			targetCountries.forEach((countryName, idx) => {
+				const token = normalizeCountryToken(countryName);
+				const fromIndex = byIndex && byIndex[idx];
+				const fromToken = token && byToken && byToken[token];
+				// Preferimos por token (más estable) y luego por índice.
+				const qset = fromToken || fromIndex;
+				if (Array.isArray(qset) && qset.length === 3) {
+					triviaQuestions[idx] = qset;
+				}
+			});
+		}
+	} catch (e) {
+		// si falla, seguimos con el autogenerador
+	}
+
+	// 2) Completa lo que falte con el generador seguro
+	targetCountries.forEach((countryName, idx) => {
+		if (!triviaQuestions[idx] || !Array.isArray(triviaQuestions[idx]) || triviaQuestions[idx].length !== 3) {
+			triviaQuestions[idx] = buildDefaultTriviaForCountry(countryName, idx);
+		}
+	});
+}
+
+// Expone el refresco para que trivia-bank.js (XML) pueda dispararlo.
+try { window.ensureTriviaForAllTargets = ensureTriviaForAllTargets; } catch (e) {}
+
+// Si `preguntas.xml` se carga después, reaplica overrides.
+try {
+	window.addEventListener('trivia-overrides-updated', () => {
+		ensureTriviaForAllTargets();
+		// Si la trivia está abierta, re-renderiza la pregunta actual.
+		try {
+			const modal = document.getElementById('trivia-modal');
+			if (modal && modal.style.display === 'flex' && triviaState && triviaState.active) {
+				renderTriviaQuestion();
+			}
+		} catch (e) {}
+	});
+} catch (e) {}
+
+// Ejecuta el autollenado una vez (mantiene las trivias personalizadas existentes).
+ensureTriviaForAllTargets();
+
 function buildTeamInfoText(countryName) {
 	const token = normalizeCountryToken(countryName);
 	const meta = (token && countryMetaByToken[token]) ? countryMetaByToken[token] : null;
@@ -1410,6 +1533,11 @@ function buildModelMapping(countries) {
 		'Uruguay': { src: 'assets/pelotaURUGUAY2.glb' },
 		'Cabo Verde': { src: 'assets/pelotaCABOVERDA.glb' },
 		'Arabia Saudita': { src: 'assets/pelotaARABIASAU.glb' },
+		// Archivos con nombres no estándar en /assets
+		'Marruecos': { src: 'assets/pelotaMARRUECOSglb.glb' },
+		'Argelia': { src: 'assets/pelotaALGERIA.glb' },
+		'Tunez': { src: 'assets/pelotaTUNISIA.glb' },
+		'Curazao': { src: 'assets/pelotaCURACAO.glb' },
 	};
 
 	// Fallback temporal: si el modelo del país no existe todavía, usa Uruguay.
