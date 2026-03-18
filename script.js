@@ -31,43 +31,10 @@ function setVideoFilter(idx) {
 	currentVideoFilter = idx;
 	renderVideoFilters();
 }
-// Preguntas de trivia por país (puedes agregar más)
-const triviaQuestions = {
-	0: [ // México
-		{
-			q: "¿Cuántos equipos participarán en el Mundial 2026?",
-			options: ["32", "40", "48", "64"],
-			answer: 2
-		},
-		{
-			q: "¿Cuántas ciudades sede tendrá México?",
-			options: ["1", "2", "3", "4"],
-			answer: 2
-		},
-		{
-			q: "¿En qué año fue la primera Copa Mundial en México?",
-			options: ["1970", "1986", "1994", "2026"],
-			answer: 0
-		}
-	],
-	2: [ // España (ejemplo)
-		{
-			q: "¿Cuántos Mundiales ha ganado España?",
-			options: ["0", "1", "2", "3"],
-			answer: 1
-		},
-		{
-			q: "¿En qué año ganó España su primer Mundial?",
-			options: ["2006", "2010", "2014", "2018"],
-			answer: 1
-		},
-		{
-			q: "¿Cuál es el apodo de la selección española?",
-			options: ["La Roja", "La Verde", "La Celeste", "La Canarinha"],
-			answer: 0
-		}
-	]
-};
+// Preguntas de trivia por país. Se rellenan automáticamente:
+// - Primero con overrides en `trivia-bank.js` (por token/índice)
+// - Luego con el generador por defecto como fallback.
+const triviaQuestions = {};
 
 let triviaState = {
 	active: false,
