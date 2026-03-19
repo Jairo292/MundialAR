@@ -277,6 +277,162 @@ let isAnimationRunning = false;
 let activeTargetIndex = null;
 let activeTargetElement = null; // reference to the currently found target element
 
+// --- Información: rotación + narración ---
+let infoNarrationUtterance = null;
+let infoNarrationActive = false;
+let infoRotationActiveModelId = null;
+
+function startInfoRotation() {
+	if (!activeAnimModel) return;
+	try {
+		// Evita re-aplicar sobre el mismo modelo.
+		if (infoRotationActiveModelId && infoRotationActiveModelId === activeAnimModel.id) return;
+		infoRotationActiveModelId = activeAnimModel.id;
+
+		// Rotación 360° continua mientras el modal esté abierto.
+		activeAnimModel.removeAttribute('animation__info');
+		const currentRot = activeAnimModel.getAttribute('rotation') || { x: 0, y: 0, z: 0 };
+		const fromY = (typeof currentRot.y === 'number') ? currentRot.y : 0;
+		activeAnimModel.setAttribute(
+			'animation__info',
+			`property: rotation; from: ${currentRot.x || 0} ${fromY} ${currentRot.z || 0}; to: ${currentRot.x || 0} ${fromY + 360} ${currentRot.z || 0}; dur: 2200; easing: linear; loop: true`
+		);
+	} catch (e) {
+		// ignore
+	}
+}
+
+function stopInfoRotation() {
+	if (!activeAnimModel) {
+		infoRotationActiveModelId = null;
+		return;
+	}
+	try {
+		activeAnimModel.removeAttribute('animation__info');
+	} catch (e) {}
+	infoRotationActiveModelId = null;
+}
+
+function speakInfoText(text) {
+	if (!text) return;
+	if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) return;
+
+	try {
+		window.speechSynthesis.cancel();
+		infoNarrationUtterance = new SpeechSynthesisUtterance(text);
+		infoNarrationUtterance.lang = 'es-MX';
+		infoNarrationUtterance.rate = 1;
+		infoNarrationUtterance.pitch = 1;
+		infoNarrationUtterance.volume = 1;
+		infoNarrationActive = true;
+		infoNarrationUtterance.onend = () => { infoNarrationActive = false; };
+		infoNarrationUtterance.onerror = () => { infoNarrationActive = false; };
+		window.speechSynthesis.speak(infoNarrationUtterance);
+	} catch (e) {
+		infoNarrationActive = false;
+	}
+}
+
+function stopInfoNarration() {
+	if (!('speechSynthesis' in window)) return;
+	try {
+		window.speechSynthesis.cancel();
+	} catch (e) {}
+	infoNarrationActive = false;
+	infoNarrationUtterance = null;
+}
+
+// --- Marcador simulado (overlay) ---
+let scoreSimEl = null;
+let scoreSimMetaEl = null;
+let scoreSimHomeEl = null;
+let scoreSimAwayEl = null;
+let scoreSimScoreEl = null;
+let scoreSimTimer = null;
+let scoreSimActiveIndex = null;
+
+const GROUP_LETTERS = 'ABCDEFGHIJKL'.split('');
+
+function getGroupForIndex(idx) {
+	const groupIndex = Math.floor((idx || 0) / 4);
+	return GROUP_LETTERS[groupIndex] || 'A';
+}
+
+function getGroupIndices(idx) {
+	const groupIndex = Math.floor((idx || 0) / 4);
+	const start = groupIndex * 4;
+	const end = Math.min(start + 4, targetCountries.length);
+	const list = [];
+	for (let i = start; i < end; i++) list.push(i);
+	return list;
+}
+
+function pickOpponentIndex(idx) {
+	const groupmates = getGroupIndices(idx).filter(i => i !== idx);
+	if (groupmates.length === 0) return null;
+	// determinista: siguiente dentro del grupo
+	const pos = getGroupIndices(idx).indexOf(idx);
+	const pick = groupmates[(Math.max(0, pos) + 0) % groupmates.length];
+	return pick;
+}
+
+function ensureScoreSimNodes() {
+	if (scoreSimEl) return;
+	scoreSimEl = document.getElementById('score-sim');
+	scoreSimMetaEl = document.getElementById('score-sim-meta');
+	scoreSimHomeEl = document.getElementById('score-sim-home');
+	scoreSimAwayEl = document.getElementById('score-sim-away');
+	scoreSimScoreEl = document.getElementById('score-sim-score');
+}
+
+function renderScoreSim(idx) {
+	ensureScoreSimNodes();
+	if (!scoreSimEl || idx === null || idx === undefined) return;
+
+	const country = targetCountries[idx] || 'Equipo';
+	const oppIdx = pickOpponentIndex(idx);
+	const opp = (oppIdx !== null && oppIdx !== undefined) ? (targetCountries[oppIdx] || 'Rival') : 'Rival';
+	const group = getGroupForIndex(idx);
+
+	// Cambia cada 8s (simulación)
+	const bucket = Math.floor(Date.now() / 8000);
+	const seed = ((idx + 1) * 100000) + ((oppIdx !== null ? (oppIdx + 1) : 7) * 1000) + bucket;
+	const rnd = seededRng(seed);
+	const minute = Math.floor(rnd() * 91);
+	const home = Math.floor(rnd() * 5);
+	const away = Math.floor(rnd() * 5);
+
+	if (scoreSimMetaEl) scoreSimMetaEl.textContent = `Grupo ${group} • Min ${minute}'`;
+	if (scoreSimHomeEl) scoreSimHomeEl.textContent = country;
+	if (scoreSimAwayEl) scoreSimAwayEl.textContent = opp;
+	if (scoreSimScoreEl) scoreSimScoreEl.textContent = `${home} - ${away}`;
+}
+
+function showScoreSim(idx) {
+	ensureScoreSimNodes();
+	if (!scoreSimEl) return;
+	scoreSimActiveIndex = idx;
+	renderScoreSim(idx);
+	scoreSimEl.hidden = false;
+	if (scoreSimTimer) clearInterval(scoreSimTimer);
+	scoreSimTimer = setInterval(() => {
+		if (scoreSimActiveIndex === null || scoreSimActiveIndex === undefined) return;
+		renderScoreSim(scoreSimActiveIndex);
+	}, 1500);
+}
+
+function hideScoreSim(idx) {
+	ensureScoreSimNodes();
+	if (!scoreSimEl) return;
+	if (idx !== null && idx !== undefined && scoreSimActiveIndex !== idx) return;
+	scoreSimActiveIndex = null;
+	scoreSimEl.hidden = true;
+	if (scoreSimTimer) {
+		clearInterval(scoreSimTimer);
+		scoreSimTimer = null;
+	}
+}
+
 async function startCamera() {
 	if (!scanVideo || !navigator.mediaDevices?.getUserMedia) {
 		return;
@@ -664,6 +820,81 @@ targetCountries.forEach((countryName, idx) => {
 	}
 });
 
+function normalizeCountryWords(name) {
+	return (name || '')
+		.toString()
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.replace(/[^a-zA-Z0-9\s]/g, ' ')
+		.split(/\s+/)
+		.map(w => w.trim())
+		.filter(Boolean);
+}
+
+function toLowerCamel(words) {
+	if (!words || words.length === 0) return '';
+	const first = words[0].toLowerCase();
+	const rest = words.slice(1).map(w => (w ? (w[0].toUpperCase() + w.slice(1).toLowerCase()) : '')).join('');
+	return `${first}${rest}`;
+}
+
+function buildVideoCandidates(countryName, explicitFile) {
+	const candidates = [];
+	if (explicitFile) candidates.push(explicitFile);
+
+	const words = normalizeCountryWords(countryName);
+	const joinedLower = words.join('').toLowerCase();
+	const camel = toLowerCamel(words);
+
+	if (camel) candidates.push(`${camel}.mp4`);
+	if (joinedLower) candidates.push(`${joinedLower}.mp4`);
+
+	// último recurso: token completo (sin espacios) en lowercase
+	const token = normalizeCountryToken(countryName);
+	if (token) candidates.push(`${token.toLowerCase()}.mp4`);
+
+	// dedupe preservando orden
+	return [...new Set(candidates.filter(Boolean))];
+}
+
+function playVideoWithCandidates(videoEl, candidates, onFail) {
+	if (!videoEl) return;
+	let idx = 0;
+
+	const tryNext = () => {
+		if (idx >= candidates.length) {
+			cleanup();
+			if (typeof onFail === 'function') onFail();
+			return;
+		}
+		const file = candidates[idx++];
+		videoEl.src = `assets/galeria/${file}`;
+		videoEl.load();
+	};
+
+	const onError = () => {
+		// intenta el siguiente candidato
+		tryNext();
+	};
+
+	const onLoaded = () => {
+		// ya cargó uno válido
+		cleanup();
+	};
+
+	const cleanup = () => {
+		videoEl.removeEventListener('error', onError);
+		videoEl.removeEventListener('loadeddata', onLoaded);
+		videoEl.removeEventListener('canplay', onLoaded);
+	};
+
+	cleanup();
+	videoEl.addEventListener('error', onError);
+	videoEl.addEventListener('loadeddata', onLoaded);
+	videoEl.addEventListener('canplay', onLoaded);
+	tryNext();
+}
+
 function showDataModal() {
 	if (!dataModal || !dataTitleEl) return;
 	const data = teamData[activeTargetIndex];
@@ -675,6 +906,12 @@ function showDataModal() {
 		infoBody.textContent = data && data.text ? data.text : 'Escanea un escudo para ver la información.';
 	}
 	dataModal.classList.add("is-open");
+
+	// Mientras el popup está abierto: rotación 360° + narración en voz alta.
+	startInfoRotation();
+	if (data && data.text) {
+		speakInfoText(data.text);
+	}
 }
 
 function hideDataModal() {
@@ -682,30 +919,42 @@ function hideDataModal() {
 		return;
 	}
 	dataModal.classList.remove("is-open");
+	stopInfoNarration();
+	stopInfoRotation();
 }
 
 function showVideoModal() {
 	if (!videoModal || !videoTitleEl || !videoPlayerEl) {
 		return;
 	}
-	const info = teamVideos[activeTargetIndex];
-	if (!info || !info.file) {
-		videoTitleEl.textContent = "Video";
-		videoPlayerEl.src = "";
-		if (videoCaptionEl) videoCaptionEl.textContent = "No hay video disponible para este país.";
+	if (activeTargetIndex === null || activeTargetIndex === undefined) {
+		videoTitleEl.textContent = 'Video';
+		videoPlayerEl.src = '';
+		if (videoCaptionEl) videoCaptionEl.textContent = 'Escanea un escudo para ver el video.';
 		videoModal.hidden = false;
-		videoModal.classList.add("is-open");
+		videoModal.classList.add('is-open');
+		currentVideoFilter = 0;
 		renderVideoFilters();
 		return;
 	}
-	videoTitleEl.textContent = `Video - ${info.name}`;
-	videoPlayerEl.src = `assets/galeria/${info.file}`;
-	videoPlayerEl.style.display = "block";
+
+	const countryName = targetCountries[activeTargetIndex] || (teamVideos[activeTargetIndex] && teamVideos[activeTargetIndex].name) || '';
+	const info = teamVideos[activeTargetIndex] || { name: countryName, file: null, caption: '' };
+	const candidates = buildVideoCandidates(countryName, info.file);
+
+	videoTitleEl.textContent = `Video - ${info.name || countryName || 'Selección'}`;
+	videoPlayerEl.style.display = 'block';
 	videoPlayerEl.hidden = false;
-	videoPlayerEl.load();
-	if (videoCaptionEl) {
-		videoCaptionEl.textContent = info.caption || "";
-	}
+	if (videoCaptionEl) videoCaptionEl.textContent = info.caption || '';
+
+	// Reproducir probando candidatos; si ninguno existe, muestra mensaje.
+	playVideoWithCandidates(videoPlayerEl, candidates, () => {
+		videoPlayerEl.src = '';
+		if (videoCaptionEl) {
+			videoCaptionEl.textContent = 'No hay video disponible para este país. Agrega un MP4 en assets/galeria con el nombre del país.';
+		}
+	});
+
 	videoModal.hidden = false;
 	videoModal.classList.add("is-open");
 	currentVideoFilter = 0;
@@ -718,6 +967,8 @@ function hideVideoModal() {
 	}
 	videoPlayerEl.pause();
 	videoPlayerEl.currentTime = 0;
+	videoPlayerEl.removeAttribute('src');
+	videoPlayerEl.load();
 	if (videoCaptionEl) {
 		videoCaptionEl.textContent = "";
 	}
@@ -729,9 +980,9 @@ function updateVideoButtonState() {
 	if (!videoButton) {
 		return;
 	}
-	const info = activeTargetIndex !== null ? teamVideos[activeTargetIndex] : null;
-	const hasVideo = !!(info && info.file);
-	videoButton.setAttribute("aria-disabled", hasVideo ? "false" : "true");
+	// Habilita el botón cuando hay un target activo; si el archivo no existe se mostrará aviso.
+	const hasTarget = activeTargetIndex !== null && activeTargetIndex !== undefined;
+	videoButton.setAttribute('aria-disabled', hasTarget ? 'false' : 'true');
 }
 
 function getVisualEffectLayout(target) {
@@ -1615,6 +1866,7 @@ function registerDynamicTargets() {
 			activeAnimModel = modelNode;
 			activeTargetElement = t;
 			activeTargetIndex = idx;
+			showScoreSim(idx);
 			updateVideoButtonState();
 			modelNode.addEventListener('model-loaded', () => {
 				// Apply custom texture for this target (if provided)
@@ -1661,6 +1913,7 @@ function registerDynamicTargets() {
 				if (activeTargetIndex === idx) {
 					activeTargetIndex = null;
 								if (activeTargetElement === t) activeTargetElement = null;
+					hideScoreSim(idx);
 				}
 				t.removeChild(t._modelAdded);
 				t._modelAdded = null;
@@ -1775,9 +2028,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		dataButton.addEventListener("click", showDataModal);
 	}
 	if (dataCloseButton) {
-		dataCloseButton.addEventListener("click", () => {
-			if (dataModal) dataModal.classList.remove("is-open");
-		});
+		dataCloseButton.addEventListener("click", hideDataModal);
 	}
 	if (videoButton) {
 		videoButton.addEventListener("click", showVideoModal);
