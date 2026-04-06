@@ -257,6 +257,41 @@ GHANA: [
 			{ q: '¿A qué confederación pertenece Ghana?', options: ['UEFA', 'CAF', 'AFC', 'CONCACAF'], answer: 1 },
 			{ q: '¿En qué Mundial llegó a cuartos de final sorprendiendo al mundo?', options: ['2014', '2006', '2010', '2018'], answer: 2 },
 ],
+CONGO: [
+	{ q: '¿A qué confederación pertenece Congo?', options: ['CAF', 'UEFA', 'AFC', 'CONMEBOL'], answer: 0 },
+	{ q: '¿En qué continente se encuentra Congo?', options: ['Asia', 'África', 'Europa', 'América'], answer: 1 },
+	{ q: '¿Cuál es el color predominante en su bandera?', options: ['Rojo', 'Verde', 'Azul', 'Negro'], answer: 1 },
+],
+
+TURQUIA: [
+	{ q: '¿A qué confederación pertenece Turquía?', options: ['UEFA', 'AFC', 'CAF', 'CONMEBOL'], answer: 0 },
+	{ q: '¿En qué torneo destacó Turquía en 2002?', options: ['Eurocopa', 'Copa América', 'Mundial', 'Copa Africana'], answer: 2 },
+	{ q: '¿Qué símbolo aparece en su bandera?', options: ['Estrella y luna', 'Cruz', 'Sol', 'Águila'], answer: 0 },
+],
+
+SUECIA: [
+	{ q: '¿A qué confederación pertenece Suecia?', options: ['UEFA', 'CAF', 'AFC', 'CONCACAF'], answer: 0 },
+	{ q: '¿Qué jugador famoso es de Suecia?', options: ['Haaland', 'Ibrahimović', 'Modrić', 'Lewandowski'], answer: 1 },
+	{ q: '¿Cuál es el color principal de su uniforme?', options: ['Rojo', 'Azul y amarillo', 'Verde', 'Negro'], answer: 1 },
+],
+
+IRAK: [
+	{ q: '¿A qué confederación pertenece Irak?', options: ['AFC', 'CAF', 'UEFA', 'CONMEBOL'], answer: 0 },
+	{ q: '¿En qué continente se encuentra Irak?', options: ['Europa', 'África', 'Asia', 'Oceanía'], answer: 2 },
+	{ q: '¿Qué logró Irak en 2007?', options: ['Ganó la Copa Asiática', 'Clasificó al Mundial', 'Ganó la Euro', 'Nada'], answer: 0 },
+],
+
+BOSNIAYHERZEGOVINA: [
+	{ q: '¿A qué confederación pertenece Bosnia y Herzegovina?', options: ['UEFA', 'CAF', 'AFC', 'CONCACAF'], answer: 0 },
+	{ q: '¿En qué continente se encuentra?', options: ['Asia', 'Europa', 'África', 'América'], answer: 1 },
+	{ q: '¿En qué año debutó en un Mundial?', options: ['2014', '2018', '2010', '2006'], answer: 0 },
+],
+
+REPUBLICACHECA: [
+	{ q: '¿A qué confederación pertenece República Checa?', options: ['UEFA', 'CAF', 'AFC', 'CONMEBOL'], answer: 0 },
+	{ q: '¿Qué torneo ganó como Checoslovaquia?', options: ['Mundial', 'Eurocopa', 'Copa América', 'Ninguno'], answer: 1 },
+	{ q: '¿Qué color destaca en su uniforme?', options: ['Rojo', 'Verde', 'Amarillo', 'Negro'], answer: 0 },
+],
 	};
 
 	window.triviaOverrides = { byIndex, byToken };

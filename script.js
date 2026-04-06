@@ -554,7 +554,13 @@ const targetCountries = [
 	'Inglaterra',
 	'Croacia',
 	'Panama',
-	'Ghana'
+	'Ghana',
+	'Bosnia y Herzegovina',
+	'Republica Checa',
+	'Irak',
+	'Suecia',
+	'Turquia',
+	'Congo'
 ];
 
 // Metadatos básicos para generar la descripción de Información por país.
@@ -602,6 +608,12 @@ const countryMetaByToken = {
 	CROACIA: { confed: 'UEFA' },
 	PANAMA: { confed: 'CONCACAF' },
 	GHANA: { confed: 'CAF' },
+	CONGO: { confed: 'CAF' },
+	TURQUIA: { confed: 'UEFA' },
+	SUECIA: { confed: 'UEFA' },
+	IRAK: { confed: 'AFC' },
+	BOSNIAYHERZEGOVINA: { confed: 'UEFA' },
+	REPUBLICACHECA: { confed: 'UEFA' }
 };
 
 // ---------- Trivia: autogenerar para todos los equipos ----------
@@ -1500,6 +1512,12 @@ const countryAbbrByToken = {
 	CROACIA: 'CRO',
 	PANAMA: 'PAN',
 	GHANA: 'GHA',
+	CONGO: 'CGO',
+	TURQUIA: 'TUR',
+	SUECIA: 'SWE',
+	IRAK: 'IRQ',
+	BOSNIAYHERZEGOVINA: 'BIH',
+	REPUBLICACHECA: 'CZE',
 };
 
 function getCountryAbbr(countryName) {
