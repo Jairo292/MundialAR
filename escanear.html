@@ -1,266 +1,274 @@
-  <!-- El botón de trivia se moverá a la botonera inferior -->
-      <div id="trivia-modal" class="trivia-modal" style="display:none;">
-        <div class="trivia-popup">
-          <div class="trivia-header">
-            <span class="trivia-title">Trivia AR</span>
-            <span class="trivia-score" id="trivia-score">0 puntos</span>
-            <button class="trivia-close" id="trivia-close">×</button>
-          </div>
-          <div class="trivia-progress">
-            <span class="trivia-progress-label" id="trivia-progress-label">Pregunta 1 de 3</span>
-            <div class="trivia-progress-bar-bg"><div class="trivia-progress-bar" id="trivia-progress-bar"></div></div>
-          </div>
-          <div class="trivia-question" id="trivia-question"></div>
-          <div class="trivia-options" id="trivia-options"></div>
-          <div class="trivia-timer" id="trivia-timer"></div>
-        </div>
+<!-- El botón de trivia se moverá a la botonera inferior -->
+<div id="trivia-modal" class="trivia-modal" style="display:none;">
+  <div class="trivia-popup">
+    <div class="trivia-header">
+      <span class="trivia-title">Trivia AR</span>
+      <span class="trivia-score" id="trivia-score">0 puntos</span>
+      <button class="trivia-close" id="trivia-close">×</button>
+    </div>
+    <div class="trivia-progress">
+      <span class="trivia-progress-label" id="trivia-progress-label">Pregunta 1 de 3</span>
+      <div class="trivia-progress-bar-bg">
+        <div class="trivia-progress-bar" id="trivia-progress-bar"></div>
       </div>
+    </div>
+    <div class="trivia-question" id="trivia-question"></div>
+    <div class="trivia-options" id="trivia-options"></div>
+    <div class="trivia-timer" id="trivia-timer"></div>
+  </div>
+</div>
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-    <title>Escanear</title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-  </head>
-  <body class="page-scan">
 
-    <div class="camera-frame">
-      <a-scene
-        class="ar-scene"
-        mindar-image="imageTargetSrc: assets/targets.mind; autoStart: true; warmupTolerance: 2; missTolerance: 8;"
-        vr-mode-ui="enabled: false"
-        device-orientation-permission-ui="enabled: false"
-        renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true; antialias: true"
-        embedded
-      >
-        <a-assets></a-assets>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>Escanear</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+</head>
 
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+<body class="page-scan">
 
-        <!-- Targets MindAR: el targetIndex debe coincidir con el orden en assets/targets.mind -->
-        <a-entity mindar-image-target="targetIndex: 0" data-anim-model="#model-0"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 1" data-anim-model="#model-1"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 2" data-anim-model="#model-2"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 3" data-anim-model="#model-3"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 4" data-anim-model="#model-4"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 5" data-anim-model="#model-5"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 6" data-anim-model="#model-6"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 7" data-anim-model="#model-7"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 8" data-anim-model="#model-8"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 9" data-anim-model="#model-9"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 10" data-anim-model="#model-10"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 11" data-anim-model="#model-11"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 12" data-anim-model="#model-12"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 13" data-anim-model="#model-13"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 14" data-anim-model="#model-14"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 15" data-anim-model="#model-15"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 16" data-anim-model="#model-16"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 17" data-anim-model="#model-17"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 18" data-anim-model="#model-18"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 19" data-anim-model="#model-19"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 20" data-anim-model="#model-20"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 21" data-anim-model="#model-21"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 22" data-anim-model="#model-22"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 23" data-anim-model="#model-23"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 24" data-anim-model="#model-24"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 25" data-anim-model="#model-25"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 26" data-anim-model="#model-26"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 27" data-anim-model="#model-27"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 28" data-anim-model="#model-28"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 29" data-anim-model="#model-29"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 30" data-anim-model="#model-30"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 31" data-anim-model="#model-31"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 32" data-anim-model="#model-32"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 33" data-anim-model="#model-33"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 34" data-anim-model="#model-34"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 35" data-anim-model="#model-35"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 36" data-anim-model="#model-36"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 37" data-anim-model="#model-37"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 38" data-anim-model="#model-38"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 39" data-anim-model="#model-39"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 40" data-anim-model="#model-40"></a-entity>
-        <a-entity mindar-image-target="targetIndex: 41" data-anim-model="#model-41"></a-entity>
-      </a-scene>
+  <div class="camera-frame">
+    <a-scene class="ar-scene"
+      mindar-image="imageTargetSrc: assets/targets.mind; autoStart: true; warmupTolerance: 2; missTolerance: 8;"
+      vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false"
+      renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true; antialias: true" embedded>
+      <a-assets></a-assets>
 
-      <div id="score-sim" class="score-sim" hidden>
-        <div class="score-sim-meta" id="score-sim-meta">Grupo A • Min 0'</div>
-        <div class="score-sim-line">
-          <span class="score-sim-team" id="score-sim-home">Equipo</span>
-          <span class="score-sim-score" id="score-sim-score">0 - 0</span>
-          <span class="score-sim-team" id="score-sim-away">Rival</span>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <!-- Targets MindAR: el targetIndex debe coincidir con el orden en assets/targets.mind -->
+      <a-entity mindar-image-target="targetIndex: 0" data-anim-model="#model-0"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 1" data-anim-model="#model-1"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 2" data-anim-model="#model-2"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 3" data-anim-model="#model-3"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 4" data-anim-model="#model-4"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 5" data-anim-model="#model-5"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 6" data-anim-model="#model-6"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 7" data-anim-model="#model-7"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 8" data-anim-model="#model-8"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 9" data-anim-model="#model-9"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 10" data-anim-model="#model-10"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 11" data-anim-model="#model-11"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 12" data-anim-model="#model-12"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 13" data-anim-model="#model-13"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 14" data-anim-model="#model-14"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 15" data-anim-model="#model-15"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 16" data-anim-model="#model-16"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 17" data-anim-model="#model-17"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 18" data-anim-model="#model-18"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 19" data-anim-model="#model-19"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 20" data-anim-model="#model-20"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 21" data-anim-model="#model-21"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 22" data-anim-model="#model-22"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 23" data-anim-model="#model-23"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 24" data-anim-model="#model-24"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 25" data-anim-model="#model-25"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 26" data-anim-model="#model-26"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 27" data-anim-model="#model-27"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 28" data-anim-model="#model-28"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 29" data-anim-model="#model-29"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 30" data-anim-model="#model-30"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 31" data-anim-model="#model-31"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 32" data-anim-model="#model-32"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 33" data-anim-model="#model-33"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 34" data-anim-model="#model-34"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 35" data-anim-model="#model-35"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 36" data-anim-model="#model-36"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 37" data-anim-model="#model-37"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 38" data-anim-model="#model-38"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 39" data-anim-model="#model-39"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 40" data-anim-model="#model-40"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 41" data-anim-model="#model-41"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 42" data-anim-model="#model-42"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 43" data-anim-model="#model-43"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 44" data-anim-model="#model-44"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 45" data-anim-model="#model-45"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 46" data-anim-model="#model-46"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 47" data-anim-model="#model-47"></a-entity>
+    </a-scene>
+
+    <div id="score-sim" class="score-sim" hidden>
+      <div class="score-sim-meta" id="score-sim-meta">Grupo A • Min 0'</div>
+      <div class="score-sim-line">
+        <span class="score-sim-team" id="score-sim-home">Equipo</span>
+        <span class="score-sim-score" id="score-sim-score">0 - 0</span>
+        <span class="score-sim-team" id="score-sim-away">Rival</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="screen">
+    <div class="bg-layer"></div>
+    <div class="year-stack" aria-hidden="true">2029 2026 2029 2026</div>
+
+    <input id="tray-toggle" class="tray-toggle" type="checkbox" />
+
+    <header class="topbar">
+      <a class="icon-btn back-btn" href="index.html" aria-label="Volver">
+        <span class="icon">&#8592;</span>
+      </a>
+    </header>
+
+    <!-- Botonera fija abajo -->
+    <div class="tray-buttons fixed-bottom-btns"
+      style="position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; gap: 12px; justify-content: center; background: rgba(255,255,255,0.45); padding: 12px 0 16px 0; box-shadow: 0 -2px 12px rgba(0,0,0,0.08); backdrop-filter: blur(6px);">
+      <button id="anim-btn" class="cta-btn" type="button">Animación</button>
+      <button id="data-btn" class="cta-btn" type="button">Información</button>
+      <button id="video-btn" class="cta-btn" type="button">Video</button>
+      <button id="trivia-btn" class="cta-btn" type="button">Modo Trivia</button>
+      <button id="effects-btn" class="cta-btn" type="button">Efectos Visuales</button>
+      <button id="model-effects-btn" class="cta-btn" type="button">Efectos Modelo</button>
+    </div>
+
+    <section class="scan scan-full">
+      <div class="scan-viewport"></div>
+
+      <p class="scan-text">
+        MUNDIAL AR - Escanea el escudo de un equipo de futbol participante en el Mundial.
+      </p>
+    </section>
+
+    <div id="data-modal" class="modal-overlay data-modal info-popup" role="dialog" aria-modal="true"
+      aria-labelledby="data-title" aria-describedby="data-body">
+      <div class="info-popup-content">
+        <div class="info-popup-header">
+          <div>
+            <h2 id="data-title" class="info-popup-title">Información</h2>
+            <span class="info-popup-subtitle">Escanea un escudo para ver la información.</span>
+          </div>
+          <button id="data-close" class="info-popup-close" type="button">×</button>
+        </div>
+        <div class="info-popup-grid">
+          <div class="info-popup-card">
+            <div class="info-popup-card-title">16 Ciudades</div>
+            <div class="info-popup-card-desc">Sedes</div>
+          </div>
+          <div class="info-popup-card">
+            <div class="info-popup-card-title">11 Jun - 19 Jul</div>
+            <div class="info-popup-card-desc">Fecha</div>
+          </div>
+          <div class="info-popup-card">
+            <div class="info-popup-card-title">48 Selecciones</div>
+            <div class="info-popup-card-desc">Equipos</div>
+          </div>
+          <div class="info-popup-card">
+            <div class="info-popup-card-title">104 Encuentros</div>
+            <div class="info-popup-card-desc">Partidos</div>
+          </div>
+        </div>
+        <div class="info-popup-hosts">
+          <div class="info-popup-host-title">Países Anfitriones</div>
+          <div class="info-popup-host-list">
+            <div class="info-popup-host"><span class="info-popup-host-flag us">US</span> <span
+                class="info-popup-host-name">Estados Unidos</span> <span class="info-popup-host-cities">11 ciudades
+                sede</span></div>
+            <div class="info-popup-host"><span class="info-popup-host-flag mx">MX</span> <span
+                class="info-popup-host-name">México</span> <span class="info-popup-host-cities">3 ciudades sede</span>
+            </div>
+            <div class="info-popup-host"><span class="info-popup-host-flag ca">CA</span> <span
+                class="info-popup-host-name">Canadá</span> <span class="info-popup-host-cities">2 ciudades sede</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <main class="screen">
-      <div class="bg-layer"></div>
-      <div class="year-stack" aria-hidden="true">2029 2026 2029 2026</div>
-
-      <input id="tray-toggle" class="tray-toggle" type="checkbox" />
-
-      <header class="topbar">
-        <a class="icon-btn back-btn" href="index.html" aria-label="Volver">
-          <span class="icon">&#8592;</span>
-        </a>
-      </header>
-
-      <!-- Botonera fija abajo -->
-      <div class="tray-buttons fixed-bottom-btns" style="position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; gap: 12px; justify-content: center; background: rgba(255,255,255,0.45); padding: 12px 0 16px 0; box-shadow: 0 -2px 12px rgba(0,0,0,0.08); backdrop-filter: blur(6px);">
-        <button id="anim-btn" class="cta-btn" type="button">Animación</button>
-        <button id="data-btn" class="cta-btn" type="button">Información</button>
-        <button id="video-btn" class="cta-btn" type="button">Video</button>
-        <button id="trivia-btn" class="cta-btn" type="button">Modo Trivia</button>
-        <button id="effects-btn" class="cta-btn" type="button">Efectos Visuales</button>
-        <button id="model-effects-btn" class="cta-btn" type="button">Efectos Modelo</button>
-      </div>
-
-      <section class="scan scan-full">
-        <div class="scan-viewport"></div>
-      
-        <p class="scan-text">
-          MUNDIAL AR - Escanea el escudo de un equipo de futbol participante en el Mundial.
-        </p>
-      </section>
-
-      <div
-        id="data-modal"
-        class="modal-overlay data-modal info-popup"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="data-title"
-        aria-describedby="data-body"
-      >
-        <div class="info-popup-content">
-          <div class="info-popup-header">
-            <div>
-              <h2 id="data-title" class="info-popup-title">Información</h2>
-              <span class="info-popup-subtitle">Escanea un escudo para ver la información.</span>
-            </div>
-            <button id="data-close" class="info-popup-close" type="button">×</button>
-          </div>
-          <div class="info-popup-grid">
-            <div class="info-popup-card"><div class="info-popup-card-title">16 Ciudades</div><div class="info-popup-card-desc">Sedes</div></div>
-            <div class="info-popup-card"><div class="info-popup-card-title">11 Jun - 19 Jul</div><div class="info-popup-card-desc">Fecha</div></div>
-            <div class="info-popup-card"><div class="info-popup-card-title">48 Selecciones</div><div class="info-popup-card-desc">Equipos</div></div>
-            <div class="info-popup-card"><div class="info-popup-card-title">104 Encuentros</div><div class="info-popup-card-desc">Partidos</div></div>
-          </div>
-          <div class="info-popup-hosts">
-            <div class="info-popup-host-title">Países Anfitriones</div>
-            <div class="info-popup-host-list">
-              <div class="info-popup-host"><span class="info-popup-host-flag us">US</span> <span class="info-popup-host-name">Estados Unidos</span> <span class="info-popup-host-cities">11 ciudades sede</span></div>
-              <div class="info-popup-host"><span class="info-popup-host-flag mx">MX</span> <span class="info-popup-host-name">México</span> <span class="info-popup-host-cities">3 ciudades sede</span></div>
-              <div class="info-popup-host"><span class="info-popup-host-flag ca">CA</span> <span class="info-popup-host-name">Canadá</span> <span class="info-popup-host-cities">2 ciudades sede</span></div>
-            </div>
-          </div>
+    <div id="video-modal" class="modal-overlay video-modal" hidden role="dialog" aria-modal="true"
+      aria-labelledby="video-title" aria-describedby="video-message">
+      <div class="video-popup">
+        <div class="video-popup-header">
+          <h2 id="video-title" class="video-popup-title">Video - Mundial 2026</h2>
+          <button id="video-close" class="video-popup-close" type="button">×</button>
+        </div>
+        <div class="video-popup-player">
+          <video id="video-player" class="video-player" controls playsinline></video>
+        </div>
+        <p id="video-caption" class="video-caption"></p>
+        <div class="video-popup-filters">
+          <div class="video-popup-filters-title">Filtros Visuales</div>
+          <div class="video-popup-filters-btns" id="video-filters-btns"></div>
+          <div class="video-popup-filters-desc" id="video-filters-desc"></div>
         </div>
       </div>
+    </div>
 
-      <div
-        id="video-modal"
-        class="modal-overlay video-modal"
-        hidden
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="video-title"
-        aria-describedby="video-message"
-      >
-        <div class="video-popup">
-          <div class="video-popup-header">
-            <h2 id="video-title" class="video-popup-title">Video - Mundial 2026</h2>
-            <button id="video-close" class="video-popup-close" type="button">×</button>
-          </div>
-          <div class="video-popup-player">
-            <video id="video-player" class="video-player" controls playsinline></video>
-          </div>
-          <p id="video-caption" class="video-caption"></p>
-          <div class="video-popup-filters">
-            <div class="video-popup-filters-title">Filtros Visuales</div>
-            <div class="video-popup-filters-btns" id="video-filters-btns"></div>
-            <div class="video-popup-filters-desc" id="video-filters-desc"></div>
-          </div>
+    <div id="help-modal" class="modal-overlay help-modal" hidden role="dialog" aria-modal="true"
+      aria-labelledby="help-title" aria-describedby="help-body">
+      <div class="modal-content help-modal-content">
+        <h2 id="help-title" class="modal-title">Guia rapida</h2>
+        <div id="help-body" class="modal-message help-body">
+          <p><strong>Escanear:</strong> apunta la camara a los escudos de las selecciones que vendran a Mexico al
+            Mundial 2026. Al reconocer un escudo, aparece su modelo 3D.</p>
+          <p><strong>Botones en Escanear:</strong></p>
+          <ul>
+            <li>Animacion: activa o detiene la animacion del modelo.</li>
+            <li>Datos Generales: muestra historia y datos del equipo.</li>
+            <li>Video: abre el video del equipo escaneado.</li>
+            <li>Efectos Visuales: activa los brillos alrededor del modelo.</li>
+          </ul>
+          <p><strong>Interaccion:</strong> muestra un modelo 3D y te permite entrar a la Trivia. Hay dos niveles: normal
+            y experto.</p>
+          <p><strong>Galeria:</strong> contiene videos generales de Mundiales.</p>
+          <p><strong>Stats:</strong> muestra resultados en vivo y la tabla del grupo.</p>
+        </div>
+        <div class="modal-buttons">
+          <button id="help-close" class="modal-btn cancel-btn" type="button">Volver</button>
         </div>
       </div>
+    </div>
 
-      <div
-        id="help-modal"
-        class="modal-overlay help-modal"
-        hidden
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="help-title"
-        aria-describedby="help-body"
-      >
-        <div class="modal-content help-modal-content">
-          <h2 id="help-title" class="modal-title">Guia rapida</h2>
-          <div id="help-body" class="modal-message help-body">
-            <p><strong>Escanear:</strong> apunta la camara a los escudos de las selecciones que vendran a Mexico al Mundial 2026. Al reconocer un escudo, aparece su modelo 3D.</p>
-            <p><strong>Botones en Escanear:</strong></p>
-            <ul>
-              <li>Animacion: activa o detiene la animacion del modelo.</li>
-              <li>Datos Generales: muestra historia y datos del equipo.</li>
-              <li>Video: abre el video del equipo escaneado.</li>
-              <li>Efectos Visuales: activa los brillos alrededor del modelo.</li>
-            </ul>
-            <p><strong>Interaccion:</strong> muestra un modelo 3D y te permite entrar a la Trivia. Hay dos niveles: normal y experto.</p>
-            <p><strong>Galeria:</strong> contiene videos generales de Mundiales.</p>
-            <p><strong>Stats:</strong> muestra resultados en vivo y la tabla del grupo.</p>
-          </div>
-          <div class="modal-buttons">
-            <button id="help-close" class="modal-btn cancel-btn" type="button">Volver</button>
-          </div>
+    <!-- Botón de ayuda (inferior derecha) -->
+    <button id="help-btn" class="help-button" aria-label="Ayuda">
+      <span class="help-mark">?</span>
+      <span class="help-tooltip">Ayuda / Tutorial</span>
+    </button>
+
+    <!-- Modal Tutorial (pasos) -->
+    <div id="tutorial-modal" class="tutorial-modal" aria-hidden="true">
+      <div class="tutorial-content">
+        <div class="tutorial-header">
+          <h3 class="tutorial-title">Tutorial rápido</h3>
+          <button id="tutorial-close" class="tutorial-close" aria-label="Cerrar">×</button>
+        </div>
+        <img id="tutorial-image" class="tutorial-image" src="assets/Flag_of_Mexico.svg.webp" alt="Paso" />
+        <div id="tutorial-desc" class="tutorial-desc">Descripción del paso.</div>
+        <div class="tutorial-footer">
+          <button id="tutorial-prev" class="tutorial-nav-btn">Anterior</button>
+          <span id="tutorial-step-indicator" class="tutorial-step-indicator">1 / 4</span>
+          <button id="tutorial-next" class="tutorial-nav-btn">Siguiente</button>
         </div>
       </div>
-
-      <!-- Botón de ayuda (inferior derecha) -->
-      <button id="help-btn" class="help-button" aria-label="Ayuda">
-        <span class="help-mark">?</span>
-        <span class="help-tooltip">Ayuda / Tutorial</span>
-      </button>
-
-      <!-- Modal Tutorial (pasos) -->
-      <div id="tutorial-modal" class="tutorial-modal" aria-hidden="true">
-        <div class="tutorial-content">
-          <div class="tutorial-header">
-            <h3 class="tutorial-title">Tutorial rápido</h3>
-            <button id="tutorial-close" class="tutorial-close" aria-label="Cerrar">×</button>
-          </div>
-          <img id="tutorial-image" class="tutorial-image" src="assets/Flag_of_Mexico.svg.webp" alt="Paso" />
-          <div id="tutorial-desc" class="tutorial-desc">Descripción del paso.</div>
-          <div class="tutorial-footer">
-            <button id="tutorial-prev" class="tutorial-nav-btn">Anterior</button>
-            <span id="tutorial-step-indicator" class="tutorial-step-indicator">1 / 4</span>
-            <button id="tutorial-next" class="tutorial-nav-btn">Siguiente</button>
-          </div>
-        </div>
-      </div>
-    </main>
-    <script src="trivia-bank.js"></script>
-    <script src="script.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const helpModal = document.querySelector("#help-modal");
-        const closeBtn = document.querySelector("#help-close");
-        const triggers = document.querySelectorAll("[data-help-open]");
-        if (!helpModal) return;
-        const openHelp = (event) => {
-          if (event) event.preventDefault();
-          helpModal.hidden = false;
-          helpModal.classList.add("is-open");
-        };
-        triggers.forEach((trigger) => {
-          trigger.addEventListener("click", openHelp);
-        });
-        if (closeBtn) {
-          closeBtn.addEventListener("click", () => {
-            helpModal.classList.remove("is-open");
-            helpModal.hidden = true;
-          });
-        }
+    </div>
+  </main>
+  <script src="trivia-bank.js"></script>
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const helpModal = document.querySelector("#help-modal");
+      const closeBtn = document.querySelector("#help-close");
+      const triggers = document.querySelectorAll("[data-help-open]");
+      if (!helpModal) return;
+      const openHelp = (event) => {
+        if (event) event.preventDefault();
+        helpModal.hidden = false;
+        helpModal.classList.add("is-open");
+      };
+      triggers.forEach((trigger) => {
+        trigger.addEventListener("click", openHelp);
       });
-    </script>
-  </body>
+      if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+          helpModal.classList.remove("is-open");
+          helpModal.hidden = true;
+        });
+      }
+    });
+  </script>
+</body>
+
 </html>
