@@ -816,7 +816,14 @@ const teamVideos = {
 	       name: "Arabia Saudita",
 	       file: "arabia.mp4",
 	       caption: "Video de la selección de Arabia Saudita...",
-       }
+    },
+
+   
+   42: {
+       name: "Bosnia y Herzegovina",
+       file: "bosnia.mp4",
+       caption: "Video de Bosnia y Herzegovina...",
+   }
 };
 
 // Completa automáticamente teamVideos para todos los países configurados.
@@ -1513,7 +1520,7 @@ const countryAbbrByToken = {
 	CROACIA: 'CRO',
 	PANAMA: 'PAN',
 	GHANA: 'GHA',
-		BOSNIAYHERZEGOVINA: 'BIH',
+	BOSNIAYHERZEGOVINA: 'BIH',
 	REPUBLICACHECA: 'CZE',
 	IRAK: 'IRQ',
 	SUECIA: 'SWE',
