@@ -2001,6 +2001,8 @@ function buildModelMapping(countries) {
 // Mapping from targetIndex -> model configuration. Each target uses its own .glb
 // file stored inside the `assets` folder.
 const modelMapping = buildModelMapping(targetCountries);
+// Debug helper: when true, add a simple visible primitive to targets on detection
+const DEBUG_FALLBACK_BOX = true;
 
 function createModelNode(cfg, index) {
 	let node;
@@ -2107,6 +2109,21 @@ function registerDynamicTargets() {
 					removeVisualEffectFromTarget(t);
 					applyVisualEffectToTarget(t);
 				}
+				// Debug fallback: append a visible box so we can confirm A-Frame renders on mobile
+				if (DEBUG_FALLBACK_BOX) {
+					try {
+						const box = document.createElement('a-box');
+						box.setAttribute('color', '#ff4444');
+						box.setAttribute('depth', '0.2');
+						box.setAttribute('height', '0.2');
+						box.setAttribute('width', '0.2');
+						box.setAttribute('position', '0 0 -0.2');
+						box.setAttribute('id', `debug-box-${idx}`);
+						t.appendChild(box);
+						t._debugBox = box;
+						console.info('Debug box appended for target', idx);
+					} catch (e) { console.warn('Could not append debug box', e); }
+				}
 			}, { once: true });
 			if (visualEffectsEnabled) {
 				applyVisualEffectToTarget(t);
@@ -2139,6 +2156,11 @@ function registerDynamicTargets() {
 						animationButton.classList.remove("is-active");
 					}
 					updateVideoButtonState();
+				}
+				// remove debug box if present
+				if (t._debugBox) {
+					try { t._debugBox.remove(); } catch (e) {}
+					t._debugBox = null;
 				}
 				if (activeTargetIndex === idx) {
 					activeTargetIndex = null;
