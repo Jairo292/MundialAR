@@ -433,14 +433,24 @@ function hideScoreSim(idx) {
 	}
 }
 
+function isMobileDevice() {
+	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
 async function startCamera() {
 	if (!scanVideo || !navigator.mediaDevices?.getUserMedia) {
 		return;
 	}
 
+	let videoConstraints = { facingMode: "environment" };
+	// Si es móvil, forzar vertical
+	if (isMobileDevice()) {
+		videoConstraints.aspectRatio = { ideal: 3/4 };
+	}
+
 	try {
 		const stream = await navigator.mediaDevices.getUserMedia({
-			video: { facingMode: "environment" },
+			video: videoConstraints,
 			audio: false,
 		});
 		scanVideo.srcObject = stream;

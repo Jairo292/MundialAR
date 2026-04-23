@@ -258,13 +258,14 @@
 }
 
 @media (max-width: 700px) {
-	.camera-frame {
-		max-width: 100vw;
-		max-height: 56vw;
-		min-height: 80px;
-		border-width: 4px;
-		border-radius: 12px;
-	}
+   .camera-frame {
+	   max-width: 100vw;
+	   max-height: 80vh;
+	   min-height: 80px;
+	   border-width: 4px;
+	   border-radius: 12px;
+	   aspect-ratio: 3/4;
+   }
 }
 
 @media (max-width: 2000px) {
