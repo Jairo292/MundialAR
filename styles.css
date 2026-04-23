@@ -1338,6 +1338,56 @@ h1 {
 	pointer-events: none;
 }
 
+/* --- Simulación vertical en escritorio --- */
+.page-scan.simulate-mobile .camera-frame {
+	aspect-ratio: 3/4 !important;
+	max-height: 80vh !important;
+}
+
+.page-scan.simulate-mobile .scan-video {
+	position: absolute !important;
+	left: 50% !important;
+	top: 50% !important;
+	transform: translate(-50%, -50%) rotate(-90deg) !important;
+	transform-origin: center center !important;
+	width: auto !important;
+	height: 140% !important; /* aumentar para cubrir después de rotar */
+	object-fit: cover !important;
+}
+
+/* (Botón de simulación eliminado) */
+
+/* Ajustes extra: rotar y escalar canvas de A-Frame/MindAR también */
+.page-scan.simulate-mobile .camera-frame {
+	aspect-ratio: unset !important;
+	height: 80vh !important;
+	max-height: 80vh !important;
+}
+
+.page-scan.simulate-mobile a-scene,
+.page-scan.simulate-mobile .ar-scene {
+	position: absolute !important;
+	left: 50% !important;
+	top: 50% !important;
+	width: auto !important;
+	height: 100% !important;
+	transform: translate(-50%, -50%) rotate(-90deg) !important;
+	transform-origin: center center !important;
+}
+
+.page-scan.simulate-mobile .ar-scene canvas {
+	position: absolute !important;
+	left: 50% !important;
+	top: 50% !important;
+	transform: translate(-50%, -50%) rotate(-90deg) scale(1.35) !important;
+	transform-origin: center center !important;
+	width: auto !important;
+	height: 140% !important;
+	object-fit: cover !important;
+}
+
+
+
 .tray-handle {
 	position: fixed;
 	left: 50%;

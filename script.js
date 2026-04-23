@@ -463,6 +463,17 @@ async function startCamera() {
 	}
 }
 
+// Activar simulación si se pasa el query param `?simulate_portrait=1`
+(function applySimulateFromQuery() {
+	try {
+		const urlParams = new URLSearchParams(window.location.search);
+		const shouldSim = urlParams.get('simulate_portrait') === '1';
+		if (shouldSim) document.body.classList.add('simulate-mobile');
+	} catch (e) {
+		// noop
+	}
+})();
+
 function triggerActiveAnimation() {
 	if (!activeAnimModel) {
 		return;
