@@ -2071,6 +2071,16 @@ function registerDynamicTargets() {
 			if (!cfg) return;
 			t._modelName = (cfg.name || '').toString().trim();
 			const modelNode = createModelNode(cfg, idx);
+			// If running on a real mobile device, adjust scale/position so model is visible
+			if (isMobileDevice()) {
+				try {
+					// prefer cfg.mobile overrides if provided
+					const mobileScale = cfg.scaleMobile || '0.25 0.25 0.25';
+					const mobilePos = cfg.positionMobile || cfg.position || '0 0 -0.35';
+					modelNode.setAttribute('scale', mobileScale);
+					modelNode.setAttribute('position', mobilePos);
+				} catch (e) { /* noop */ }
+			}
 			t.appendChild(modelNode);
 			t._modelAdded = modelNode;
 			// If config has a specific clip, update the entity's data-anim-clip attribute
