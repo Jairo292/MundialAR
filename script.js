@@ -464,11 +464,38 @@ async function startCamera() {
 }
 
 // Activar simulación si se pasa el query param `?simulate_portrait=1`
-(function applySimulateFromQuery() {
+(function applySimulateFromQueryOrSize() {
 	try {
 		const urlParams = new URLSearchParams(window.location.search);
-		const shouldSim = urlParams.get('simulate_portrait') === '1';
-		if (shouldSim) document.body.classList.add('simulate-mobile');
+		const shouldSimParam = urlParams.get('simulate_portrait') === '1';
+
+		function shouldSimBySize() {
+			try {
+				const w = window.innerWidth || document.documentElement.clientWidth;
+				const h = window.innerHeight || document.documentElement.clientHeight;
+				// Condiciones: ancho pequeño (<=420) en orientación portrait OR relación alto/ancho >= 1.6
+				if (w <= 420 && h > w) return true;
+				if (h / Math.max(w, 1) >= 1.6) return true;
+				return false;
+			} catch (e) {
+				return false;
+			}
+		}
+
+		function applySimFlag() {
+			const shouldSim = shouldSimParam || shouldSimBySize();
+			if (shouldSim) document.body.classList.add('simulate-mobile');
+			else document.body.classList.remove('simulate-mobile');
+		}
+
+		// aplicar ahora
+		applySimFlag();
+		// reaplicar al cambiar tamaño (p. ej. DevTools responsive)
+		window.addEventListener('resize', () => {
+			// pequeño debounce
+			clearTimeout(window.__simulateMobileResizeTimer);
+			window.__simulateMobileResizeTimer = setTimeout(applySimFlag, 120);
+		});
 	} catch (e) {
 		// noop
 	}
