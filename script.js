@@ -2004,6 +2004,44 @@ const modelMapping = buildModelMapping(targetCountries);
 // Debug helper: when true, add a simple visible primitive to targets on detection
 const DEBUG_FALLBACK_BOX = true;
 
+// UI banner for model load/debug messages (visible on mobile without console)
+function showModelDebugBanner(msg, type = 'info', timeout = 6000) {
+	try {
+		let el = document.getElementById('model-debug-banner');
+		if (!el) {
+			el = document.createElement('div');
+			el.id = 'model-debug-banner';
+			el.style.position = 'fixed';
+			el.style.right = '12px';
+			el.style.top = '12px';
+			el.style.zIndex = '9999';
+			el.style.padding = '10px 14px';
+			el.style.borderRadius = '10px';
+			el.style.fontFamily = 'system-ui, Arial, sans-serif';
+			el.style.fontSize = '13px';
+			el.style.boxShadow = '0 6px 18px rgba(0,0,0,0.35)';
+			document.body.appendChild(el);
+		}
+		el.textContent = msg;
+		if (type === 'error') {
+			el.style.background = 'linear-gradient(135deg,#ff6666,#ff4444)';
+			el.style.color = '#fff';
+		} else if (type === 'success') {
+			el.style.background = 'linear-gradient(135deg,#44cc88,#26a65b)';
+			el.style.color = '#042';
+		} else {
+			el.style.background = 'linear-gradient(135deg,#2b3942,#1f6f8b)';
+			el.style.color = '#fff';
+		}
+		if (timeout > 0) {
+			clearTimeout(window.__modelDebugBannerTimeout);
+			window.__modelDebugBannerTimeout = setTimeout(() => {
+				try { el.remove(); } catch (e) {}
+			}, timeout);
+		}
+	} catch (e) { /* noop */ }
+}
+
 function createModelNode(cfg, index) {
 	let node;
 	if (cfg.type === 'obj') {
@@ -2111,6 +2149,8 @@ function registerDynamicTargets() {
 			if (cfg.clip) {
 				t.setAttribute('data-anim-clip', cfg.clip);
 			}
+			// Show loading banner so user sees model fetch started
+			try { showModelDebugBanner(`Cargando modelo: ${cfg.src}`, 'info', 0); } catch (e) {}
 			// If config specifies rotation animation, set the data-rotate-anim flag
 			if (cfg.rotateAnim) {
 				t.setAttribute('data-rotate-anim', 'true');
@@ -2127,6 +2167,8 @@ function registerDynamicTargets() {
 				if (cfg.texture) {
 					applyTextureToModel(modelNode, cfg.texture);
 				}
+				// On model loaded, show success banner briefly
+				try { showModelDebugBanner(`Modelo cargado: ${cfg.name || idx}`, 'success', 3000); } catch (e) {}
 				if (visualEffectsEnabled) {
 					removeVisualEffectFromTarget(t);
 					applyVisualEffectToTarget(t);
