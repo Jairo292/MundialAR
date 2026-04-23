@@ -508,39 +508,60 @@ function applyPortraitToARMedia() {
 	})();
 	if (!isSim) return;
 
-	// Aplicar a todos los elementos <video> que parezcan provenir de la cámara
-	const vids = Array.from(document.querySelectorAll('video'));
+	// Aplicar a elementos <video> que estén dentro de .camera-frame (para no solapar header/footer)
+	const vids = Array.from(document.querySelectorAll('.camera-frame video'));
 	vids.forEach(v => {
 		try {
-			if (v.srcObject || v.autoplay || v.dataset.isArCamera) {
-				v.style.setProperty('position', 'absolute', 'important');
-				v.style.setProperty('left', '50%', 'important');
-				v.style.setProperty('top', '50%', 'important');
-				v.style.setProperty('transform', 'translate(-50%, -50%) rotate(-90deg)', 'important');
-				v.style.setProperty('transform-origin', 'center center', 'important');
-				v.style.setProperty('width', 'auto', 'important');
-				v.style.setProperty('height', '140%', 'important');
-				v.style.setProperty('object-fit', 'cover', 'important');
-				v.style.setProperty('z-index', '1', 'important');
+			if (!(v.srcObject || v.autoplay || v.dataset.isArCamera)) {
+				// aún así, si está dentro de camera-frame lo consideramos
 			}
+			const container = v.closest('.camera-frame');
+			if (!container) return;
+			const cRect = container.getBoundingClientRect();
+			// dimensiones del stream / elemento
+			const mediaW = v.videoWidth || v.clientWidth || 1280;
+			const mediaH = v.videoHeight || v.clientHeight || 720;
+			// al rotar -90deg, mediaW -> container.height, mediaH -> container.width
+			const scaleX = cRect.width / Math.max(mediaH, 1);
+			const scaleY = cRect.height / Math.max(mediaW, 1);
+			const scale = Math.max(scaleX, scaleY, 1);
+
+			v.style.setProperty('position', 'absolute', 'important');
+			v.style.setProperty('left', '50%', 'important');
+			v.style.setProperty('top', '50%', 'important');
+			v.style.setProperty('transform-origin', 'center center', 'important');
+			v.style.setProperty('transform', `translate(-50%, -50%) rotate(-90deg) scale(${scale})`, 'important');
+			v.style.setProperty('width', mediaW + 'px', 'important');
+			v.style.setProperty('height', mediaH + 'px', 'important');
+			v.style.setProperty('object-fit', 'cover', 'important');
+			v.style.setProperty('z-index', '1', 'important');
+			container.style.setProperty('overflow', 'hidden', 'important');
 		} catch (e) { console.warn('applyPortraitToARMedia video err', e); }
 	});
 
 	// Aplicar al canvas de A-Frame/MindAR
-	const canv = document.querySelectorAll('canvas');
+	const canv = Array.from(document.querySelectorAll('canvas'));
 	canv.forEach(c => {
 		try {
-			if (c.closest && c.closest('a-scene')) {
-				c.style.setProperty('position', 'absolute', 'important');
-				c.style.setProperty('left', '50%', 'important');
-				c.style.setProperty('top', '50%', 'important');
-				c.style.setProperty('transform', 'translate(-50%, -50%) rotate(-90deg) scale(1.35)', 'important');
-				c.style.setProperty('transform-origin', 'center center', 'important');
-				c.style.setProperty('width', 'auto', 'important');
-				c.style.setProperty('height', '140%', 'important');
-				c.style.setProperty('object-fit', 'cover', 'important');
-				c.style.setProperty('z-index', '0', 'important');
-			}
+			const container = c.closest('.camera-frame') || c.closest('a-scene')?.closest('.camera-frame');
+			if (!container) return;
+			const cRect = container.getBoundingClientRect();
+			const mediaW = c.width || c.clientWidth || 1280;
+			const mediaH = c.height || c.clientHeight || 720;
+			const scaleX = cRect.width / Math.max(mediaH, 1);
+			const scaleY = cRect.height / Math.max(mediaW, 1);
+			const scale = Math.max(scaleX, scaleY, 1);
+
+			c.style.setProperty('position', 'absolute', 'important');
+			c.style.setProperty('left', '50%', 'important');
+			c.style.setProperty('top', '50%', 'important');
+			c.style.setProperty('transform-origin', 'center center', 'important');
+			c.style.setProperty('transform', `translate(-50%, -50%) rotate(-90deg) scale(${scale})`, 'important');
+			c.style.setProperty('width', mediaW + 'px', 'important');
+			c.style.setProperty('height', mediaH + 'px', 'important');
+			c.style.setProperty('object-fit', 'cover', 'important');
+			c.style.setProperty('z-index', '0', 'important');
+			container.style.setProperty('overflow', 'hidden', 'important');
 		} catch (e) { console.warn('applyPortraitToARMedia canvas err', e); }
 	});
 }
