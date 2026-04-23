@@ -512,38 +512,36 @@ function applyPortraitToARMedia() {
 	const vids = Array.from(document.querySelectorAll('video'));
 	vids.forEach(v => {
 		try {
-			// heurística: video con srcObject (stream) o autoplay
 			if (v.srcObject || v.autoplay || v.dataset.isArCamera) {
-				v.style.position = 'absolute';
-				v.style.left = '50%';
-				v.style.top = '50%';
-				v.style.transform = 'translate(-50%, -50%) rotate(-90deg)';
-				v.style.transformOrigin = 'center center';
-				v.style.width = 'auto';
-				v.style.height = '140%';
-				v.style.objectFit = 'cover';
-				v.style.zIndex = '1';
+				v.style.setProperty('position', 'absolute', 'important');
+				v.style.setProperty('left', '50%', 'important');
+				v.style.setProperty('top', '50%', 'important');
+				v.style.setProperty('transform', 'translate(-50%, -50%) rotate(-90deg)', 'important');
+				v.style.setProperty('transform-origin', 'center center', 'important');
+				v.style.setProperty('width', 'auto', 'important');
+				v.style.setProperty('height', '140%', 'important');
+				v.style.setProperty('object-fit', 'cover', 'important');
+				v.style.setProperty('z-index', '1', 'important');
 			}
-		} catch (e) {}
+		} catch (e) { console.warn('applyPortraitToARMedia video err', e); }
 	});
 
 	// Aplicar al canvas de A-Frame/MindAR
 	const canv = document.querySelectorAll('canvas');
 	canv.forEach(c => {
 		try {
-			// Heurística: canvas dentro de a-scene or with width/height of viewport
 			if (c.closest && c.closest('a-scene')) {
-				c.style.position = 'absolute';
-				c.style.left = '50%';
-				c.style.top = '50%';
-				c.style.transform = 'translate(-50%, -50%) rotate(-90deg) scale(1.35)';
-				c.style.transformOrigin = 'center center';
-				c.style.width = 'auto';
-				c.style.height = '140%';
-				c.style.objectFit = 'cover';
-				c.style.zIndex = '0';
+				c.style.setProperty('position', 'absolute', 'important');
+				c.style.setProperty('left', '50%', 'important');
+				c.style.setProperty('top', '50%', 'important');
+				c.style.setProperty('transform', 'translate(-50%, -50%) rotate(-90deg) scale(1.35)', 'important');
+				c.style.setProperty('transform-origin', 'center center', 'important');
+				c.style.setProperty('width', 'auto', 'important');
+				c.style.setProperty('height', '140%', 'important');
+				c.style.setProperty('object-fit', 'cover', 'important');
+				c.style.setProperty('z-index', '0', 'important');
 			}
-		} catch (e) {}
+		} catch (e) { console.warn('applyPortraitToARMedia canvas err', e); }
 	});
 }
 
