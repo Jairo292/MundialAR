@@ -501,6 +501,68 @@ async function startCamera() {
 	}
 })();
 
+// Forzar rotación/escala en videos y canvas de AR cuando estamos en portrait-sim
+function applyPortraitToARMedia() {
+	const isSim = document.body.classList.contains('simulate-mobile') || (function(){
+		try { const w = window.innerWidth, h = window.innerHeight; return (w<=420 && h>w) || (h/Math.max(w,1) >= 1.6); } catch(e){return false}
+	})();
+	if (!isSim) return;
+
+	// Aplicar a todos los elementos <video> que parezcan provenir de la cámara
+	const vids = Array.from(document.querySelectorAll('video'));
+	vids.forEach(v => {
+		try {
+			// heurística: video con srcObject (stream) o autoplay
+			if (v.srcObject || v.autoplay || v.dataset.isArCamera) {
+				v.style.position = 'absolute';
+				v.style.left = '50%';
+				v.style.top = '50%';
+				v.style.transform = 'translate(-50%, -50%) rotate(-90deg)';
+				v.style.transformOrigin = 'center center';
+				v.style.width = 'auto';
+				v.style.height = '140%';
+				v.style.objectFit = 'cover';
+				v.style.zIndex = '1';
+			}
+		} catch (e) {}
+	});
+
+	// Aplicar al canvas de A-Frame/MindAR
+	const canv = document.querySelectorAll('canvas');
+	canv.forEach(c => {
+		try {
+			// Heurística: canvas dentro de a-scene or with width/height of viewport
+			if (c.closest && c.closest('a-scene')) {
+				c.style.position = 'absolute';
+				c.style.left = '50%';
+				c.style.top = '50%';
+				c.style.transform = 'translate(-50%, -50%) rotate(-90deg) scale(1.35)';
+				c.style.transformOrigin = 'center center';
+				c.style.width = 'auto';
+				c.style.height = '140%';
+				c.style.objectFit = 'cover';
+				c.style.zIndex = '0';
+			}
+		} catch (e) {}
+	});
+}
+
+// Observe DOM changes so we can style elements created by MindAR/AFRame
+function watchForARMedia() {
+	const observer = new MutationObserver((mutations) => {
+		applyPortraitToARMedia();
+	});
+	observer.observe(document.body, { childList: true, subtree: true });
+	// Also run once on init and on resize
+	applyPortraitToARMedia();
+	window.addEventListener('resize', () => { setTimeout(applyPortraitToARMedia, 120); });
+}
+
+// Start watching after DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+	try { watchForARMedia(); } catch (e) { /* noop */ }
+});
+
 function triggerActiveAnimation() {
 	if (!activeAnimModel) {
 		return;
