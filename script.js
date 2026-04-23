@@ -2085,6 +2085,28 @@ function registerDynamicTargets() {
 			}
 			t.appendChild(modelNode);
 			t._modelAdded = modelNode;
+			// Debug fallback: append a visible box immediately on targetFound so we can
+			// confirm the scene is rendering even if the .glb fails to load.
+			if (DEBUG_FALLBACK_BOX && !t._debugBox) {
+				try {
+					const dbg = document.createElement('a-box');
+					dbg.setAttribute('color', '#ff4444');
+					dbg.setAttribute('depth', '0.25');
+					dbg.setAttribute('height', '0.25');
+					dbg.setAttribute('width', '0.25');
+					dbg.setAttribute('position', '0 0 -0.2');
+					dbg.setAttribute('id', `debug-box-${idx}`);
+					t.appendChild(dbg);
+					t._debugBox = dbg;
+					console.info('Debug box (immediate) appended for target', idx);
+				} catch (e) { console.warn('Could not append immediate debug box', e); }
+			}
+			// Log model load errors for debugging on mobile
+			try {
+				modelNode.addEventListener('model-error', (ev) => {
+					console.error('Model error for target', idx, 'src:', cfg.src, ev);
+				});
+			} catch (e) {}
 			// If config has a specific clip, update the entity's data-anim-clip attribute
 			if (cfg.clip) {
 				t.setAttribute('data-anim-clip', cfg.clip);
