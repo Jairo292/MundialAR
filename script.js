@@ -518,15 +518,44 @@ function applyPortraitToARMedia() {
 			try {
 				const container = v.closest('.camera-frame');
 				if (!container) return;
-				v.style.setProperty('position', 'absolute', 'important');
-				v.style.setProperty('left', '0', 'important');
-				v.style.setProperty('top', '0', 'important');
-				v.style.setProperty('transform', 'none', 'important');
-				v.style.setProperty('width', '100%', 'important');
-				v.style.setProperty('height', '100%', 'important');
-				v.style.setProperty('object-fit', 'cover', 'important');
-				v.style.setProperty('z-index', '1', 'important');
-				container.style.setProperty('overflow', 'hidden', 'important');
+
+				function applyVideoLayout() {
+					try {
+						const cRect = container.getBoundingClientRect();
+						const mediaW = v.videoWidth || v.clientWidth || 1280;
+						const mediaH = v.videoHeight || v.clientHeight || 720;
+						const containerIsPortrait = cRect.height > cRect.width;
+						const mediaIsLandscape = mediaW > mediaH;
+
+						if (mediaIsLandscape && containerIsPortrait) {
+							// Rotate to upright and scale to cover
+							const scaleX = cRect.width / Math.max(mediaH, 1);
+							const scaleY = cRect.height / Math.max(mediaW, 1);
+							const scale = Math.max(scaleX, scaleY, 1);
+							v.style.setProperty('position', 'absolute', 'important');
+							v.style.setProperty('left', '50%', 'important');
+							v.style.setProperty('top', '50%', 'important');
+							v.style.setProperty('transform-origin', 'center center', 'important');
+							v.style.setProperty('transform', `translate(-50%, -50%) rotate(90deg) scale(${scale})`, 'important');
+							v.style.setProperty('width', mediaW + 'px', 'important');
+							v.style.setProperty('height', mediaH + 'px', 'important');
+						} else {
+							// No rotation required: fill container
+							v.style.setProperty('position', 'absolute', 'important');
+							v.style.setProperty('left', '0', 'important');
+							v.style.setProperty('top', '0', 'important');
+							v.style.setProperty('transform', 'none', 'important');
+							v.style.setProperty('width', '100%', 'important');
+							v.style.setProperty('height', '100%', 'important');
+						}
+						v.style.setProperty('object-fit', 'cover', 'important');
+						v.style.setProperty('z-index', '1', 'important');
+						container.style.setProperty('overflow', 'hidden', 'important');
+					} catch (e) { console.warn('applyVideoLayout err', e); }
+				}
+
+				if (v.readyState >= 1 && v.videoWidth) applyVideoLayout();
+				else v.addEventListener('loadedmetadata', applyVideoLayout, { once: true });
 			} catch (e) { console.warn('applyPortraitToARMedia mobile video err', e); }
 		});
 

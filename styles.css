@@ -271,10 +271,10 @@
 /* Mobile-specific: reserve space for header and bottom tray so camera doesn't overlap */
 @media (max-width: 420px) {
 	.page-scan .camera-frame {
-		/* header ~72px + tray ~160px (adjustable) */
-		height: calc(100vh - 72px - env(safe-area-inset-bottom, 16px) - 160px);
-		max-height: calc(100vh - 72px - env(safe-area-inset-bottom, 16px) - 120px);
-		margin-top: 12px !important;
+		/* reserve space for header and tray so camera doesn't overlap */
+		height: calc(100vh - 96px - env(safe-area-inset-bottom, 16px) - 120px);
+		max-height: calc(100vh - 96px - env(safe-area-inset-bottom, 16px) - 80px);
+		margin-top: calc(env(safe-area-inset-top, 12px) + 96px) !important;
 		margin-bottom: 8px !important;
 		border-radius: 12px !important;
 		overflow: hidden !important;
