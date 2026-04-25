@@ -571,7 +571,8 @@ function applyPortraitToARMedia() {
 				c.style.setProperty('width', '100%', 'important');
 				c.style.setProperty('height', '100%', 'important');
 				c.style.setProperty('object-fit', 'cover', 'important');
-				c.style.setProperty('z-index', '0', 'important');
+				// Canvas debe estar por encima del video de MindAR para que el modelo sea visible
+				c.style.setProperty('z-index', '2', 'important');
 				container.style.setProperty('overflow', 'hidden', 'important');
 			} catch (e) { console.warn('applyPortraitToARMedia mobile canvas err', e); }
 		});
@@ -624,7 +625,7 @@ function applyPortraitToARMedia() {
 				c.style.setProperty('width', mediaW + 'px', 'important');
 				c.style.setProperty('height', mediaH + 'px', 'important');
 				c.style.setProperty('object-fit', 'cover', 'important');
-				c.style.setProperty('z-index', '0', 'important');
+				c.style.setProperty('z-index', '2', 'important');
 				container.style.setProperty('overflow', 'hidden', 'important');
 			} catch (e) { console.warn('applyPortraitToARMedia canvas err', e); }
 		});
