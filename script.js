@@ -2114,9 +2114,9 @@ function registerDynamicTargets() {
 			// If running on a real mobile device, adjust scale/position so model is visible
 			if (isMobileDevice()) {
 				try {
-					// prefer cfg.mobile overrides if provided
-					const mobileScale = cfg.scaleMobile || '0.25 0.25 0.25';
-					const mobilePos = cfg.positionMobile || cfg.position || '0 0 -0.35';
+					// prefer cfg.mobile overrides if provided; fall back to the same scale as desktop
+					const mobileScale = cfg.scaleMobile || cfg.scale || '80 80 80';
+					const mobilePos = cfg.positionMobile || cfg.position || '0 0 -0.5';
 					modelNode.setAttribute('scale', mobileScale);
 					modelNode.setAttribute('position', mobilePos);
 				} catch (e) { /* noop */ }
