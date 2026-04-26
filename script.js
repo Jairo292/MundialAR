@@ -633,7 +633,7 @@ function applyPortraitToARMedia() {
 }
 
 // Observe DOM changes so we can style elements created by MindAR/AFRame
-function watchForARMedia() {
+/*function watchForARMedia() {
 	const observer = new MutationObserver((mutations) => {
 		applyPortraitToARMedia();
 	});
@@ -642,11 +642,12 @@ function watchForARMedia() {
 	applyPortraitToARMedia();
 	window.addEventListener('resize', () => { setTimeout(applyPortraitToARMedia, 120); });
 }
-
+*/
 // Start watching after DOM ready
+/*
 document.addEventListener('DOMContentLoaded', () => {
-	try { watchForARMedia(); } catch (e) { /* noop */ }
-});
+	try { watchForARMedia(); } catch (e) {  noop  }
+});*/
 
 function triggerActiveAnimation() {
 	if (!activeAnimModel) {

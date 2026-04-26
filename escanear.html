@@ -1,3 +1,18 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>Escanear</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+</head>
+
+<body class="page-scan">
 <!-- El botón de trivia se moverá a la botonera inferior -->
 <div id="trivia-modal" class="trivia-modal" style="display:none;">
   <div class="trivia-popup">
@@ -17,21 +32,6 @@
     <div class="trivia-timer" id="trivia-timer"></div>
   </div>
 </div>
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-  <title>Escanear</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-</head>
-
-<body class="page-scan">
-
   <div class="camera-frame">
     <a-scene class="ar-scene"
       mindar-image="imageTargetSrc: assets/targets.mind; autoStart: true; warmupTolerance: 2; missTolerance: 8;"
@@ -235,7 +235,7 @@
           <h3 class="tutorial-title">Tutorial rápido</h3>
           <button id="tutorial-close" class="tutorial-close" aria-label="Cerrar">×</button>
         </div>
-        <img id="tutorial-image" class="tutorial-image" src="assets/Flag_of_Mexico.svg.webp" alt="Paso" />
+        <img id="tutorial-image" class="tutorial-image" src="assets/MEX.png" alt="Paso" />
         <div id="tutorial-desc" class="tutorial-desc">Descripción del paso.</div>
         <div class="tutorial-footer">
           <button id="tutorial-prev" class="tutorial-nav-btn">Anterior</button>
