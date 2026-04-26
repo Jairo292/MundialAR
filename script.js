@@ -1991,7 +1991,7 @@ function buildModelMapping(countries) {
 			fallbackSrc: defaultFallbackSrc,
 			position: '0 0 -0.5',
 			scale: '80 80 80',
-			scaleMobile: '24 24 24',
+			scaleMobile: '34 34 34',
 			rotateAnim: true,
 		};
 		const override = overridesByName[countryName] || {};
