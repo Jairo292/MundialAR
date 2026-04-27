@@ -77,9 +77,9 @@ function renderTriviaQuestion() {
 		btn.onclick = () => selectTriviaOption(idx);
 		optionsDiv.appendChild(btn);
 	});
-	document.getElementById('trivia-progress-label').textContent = `Pregunta ${triviaState.current+1} de 3`;
+	document.getElementById('trivia-progress-label').textContent = `Pregunta ${triviaState.current+1} de 5`;
 	document.getElementById('trivia-score').textContent = `${triviaState.score} puntos`;
-	document.getElementById('trivia-progress-bar').style.width = `${((triviaState.current)/3)*100}%`;
+	document.getElementById('trivia-progress-bar').style.width = `${((triviaState.current)/5)*100}%`;
 	triviaState.timeLeft = 15;
 	updateTriviaTimer();
 }
@@ -104,7 +104,7 @@ function selectTriviaOption(idx) {
 		triviaState.score += 10;
 	}
 	triviaState.current++;
-	if (triviaState.current < 3) {
+	if (triviaState.current < 5) {
 		renderTriviaQuestion();
 	} else {
 		showTriviaResult();
@@ -703,7 +703,7 @@ function ensureTriviaForAllTargets() {
 				const fromToken = token && byToken && byToken[token];
 				// Preferimos por token (más estable) y luego por índice.
 				const qset = fromToken || fromIndex;
-				if (Array.isArray(qset) && qset.length === 3) {
+				if (Array.isArray(qset) && qset.length === 5) {
 					triviaQuestions[idx] = qset;
 				}
 			});
@@ -714,7 +714,7 @@ function ensureTriviaForAllTargets() {
 
 	// 2) Completa lo que falte con el generador seguro
 	targetCountries.forEach((countryName, idx) => {
-		if (!triviaQuestions[idx] || !Array.isArray(triviaQuestions[idx]) || triviaQuestions[idx].length !== 3) {
+		if (!triviaQuestions[idx] || !Array.isArray(triviaQuestions[idx]) || triviaQuestions[idx].length !== 5) {
 			triviaQuestions[idx] = buildDefaultTriviaForCountry(countryName, idx);
 		}
 	});
