@@ -248,10 +248,73 @@
   <script src="trivia-bank.js"></script>
   <script src="script.js"></script>
   <script>
-    // Refresca las dimensiones de MindAR al cargar para anclar el modelo correctamente
-    window.addEventListener('load', () => {
-      setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 1500);
-    });
+    // ── Forzar estilos en video/canvas inyectados por MindAR ──────────────────
+    // MindAR aplica estilos inline continuamente; el MutationObserver los sobreescribe.
+    (function () {
+      const FORCE_STYLES = {
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        margin: '0',
+        padding: '0',
+        objectFit: 'cover',
+        objectPosition: 'center center',
+        display: 'block',
+      };
+
+      function applyForceStyles(el) {
+        Object.assign(el.style, FORCE_STYLES);
+      }
+
+      function watchElement(el) {
+        applyForceStyles(el);
+        // Si MindAR muta el style del elemento, lo volvemos a corregir
+        const obs = new MutationObserver(() => applyForceStyles(el));
+        obs.observe(el, { attributes: true, attributeFilter: ['style', 'width', 'height'] });
+      }
+
+      function dispatchDelayedResize() {
+        // Empuja un resize para que MindAR recalcule las coordenadas del tracker
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 1200);
+      }
+
+      // Observar el camera-frame para capturar video/canvas en cuanto MindAR los cree
+      const frame = document.querySelector('.camera-frame');
+      if (frame) {
+        const frameObs = new MutationObserver((mutations) => {
+          mutations.forEach((m) => {
+            m.addedNodes.forEach((node) => {
+              if (node.nodeType !== 1) return;
+              if (node.tagName === 'VIDEO' || node.tagName === 'CANVAS') watchElement(node);
+              // también revisar descendientes (a-scene crea jerarquías)
+              node.querySelectorAll && node.querySelectorAll('video, canvas').forEach(watchElement);
+            });
+          });
+        });
+        frameObs.observe(frame, { childList: true, subtree: true });
+
+        // Aplicar a elementos ya existentes por si acaso
+        frame.querySelectorAll('video, canvas').forEach(watchElement);
+      }
+
+      // ── Detección de orientación ──────────────────────────────────────────────
+      // En móvil real, al girar la pantalla MindAR necesita recalcularse
+      const onOrientationChange = () => {
+        dispatchDelayedResize();
+        // Forzar re-aplicación de estilos
+        if (frame) frame.querySelectorAll('video, canvas').forEach(applyForceStyles);
+      };
+
+      screen.orientation
+        ? screen.orientation.addEventListener('change', onOrientationChange)
+        : window.addEventListener('orientationchange', onOrientationChange);
+
+      // ── Resize inicial al cargar ──────────────────────────────────────────────
+      window.addEventListener('load', dispatchDelayedResize);
+    })();
 
     document.addEventListener("DOMContentLoaded", () => {
       const helpModal = document.querySelector("#help-modal");
