@@ -248,6 +248,11 @@
   <script src="trivia-bank.js"></script>
   <script src="script.js"></script>
   <script>
+    // Refresca las dimensiones de MindAR al cargar para anclar el modelo correctamente
+    window.addEventListener('load', () => {
+      setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 1500);
+    });
+
     document.addEventListener("DOMContentLoaded", () => {
       const helpModal = document.querySelector("#help-modal");
       const closeBtn = document.querySelector("#help-close");

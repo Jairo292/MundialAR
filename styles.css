@@ -567,22 +567,25 @@
 
 /* Ajustes específicos para la pantalla de escaneo en móviles */
 @media (max-width: 768px) {
-	/* Cámara en la parte superior en móviles */
+	/* Cámara portrait que llena el área central entre el texto y la botonera */
 	.page-scan { position: relative; }
 	.page-scan .camera-frame {
 		position: fixed;
-		top: 56px;
-		left: 50%;
-		transform: translateX(-50%);
-		width: 90vw;
-		max-width: 90vw;
-		aspect-ratio: 4/3;
+		top: calc(env(safe-area-inset-top, 0px) + 80px);
+		bottom: calc(env(safe-area-inset-bottom, 0px) + 160px);
+		left: 12px;
+		right: 12px;
+		width: auto;
+		max-width: none;
 		height: auto;
-		max-height: calc(100vh - 220px);
-		border-width: 4px;
-		border-radius: 14px;
+		max-height: none;
+		aspect-ratio: unset;
+		transform: none;
+		border: 2px solid rgba(255, 255, 255, 0.3);
+		border-radius: 16px;
 		margin: 0;
 		z-index: 5;
+		overflow: hidden;
 	}
 
 	/* Botonera inferior: hacerla en grid de dos columnas y más compacta */
@@ -616,7 +619,15 @@
 
 /* En pantallas muy pequeñas (<=420px), compactar aún más */
 @media (max-width: 420px) {
-	.page-scan .camera-frame { top: 48px; width: 95vw; max-width: 95vw; max-height: calc(100vh - 210px); }
+	.page-scan .camera-frame {
+		top: calc(env(safe-area-inset-top, 0px) + 76px);
+		bottom: calc(env(safe-area-inset-bottom, 0px) + 156px);
+		left: 8px;
+		right: 8px;
+		width: auto;
+		max-width: none;
+		max-height: none;
+	}
 	.tray-buttons.fixed-bottom-btns { grid-template-columns: 1fr 1fr !important; gap:6px !important; padding: 6px 8px !important; }
 	.tray-buttons.fixed-bottom-btns .cta-btn { font-size: 0.92rem !important; padding: 8px 6px !important; }
 	.help-button { right: 10px; bottom: calc(env(safe-area-inset-bottom, 8px) + 110px); }
