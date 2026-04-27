@@ -275,10 +275,57 @@
         obs.observe(el, { attributes: true, attributeFilter: ['style', 'width', 'height'] });
       }
 
-      function dispatchDelayedResize() {
-        // Empuja un resize para que MindAR recalcule las coordenadas del tracker
-        setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
-        setTimeout(() => window.dispatchEvent(new Event('resize')), 1200);
+      // ── Ajuste dinámico del camera-frame según elementos reales ──────────────
+      // Solución para móviles reales (Samsung A54, etc.) donde vh y safe-area
+      // no coinciden con lo que mide el simulador de Chrome desktop.
+      function fitCameraFrame() {
+        const frame = document.querySelector('.camera-frame');
+        if (!frame) return;
+        // Solo en móvil
+        if (window.innerWidth > 768) { frame.style.cssText = ''; return; }
+
+        const tray = document.querySelector('.tray-buttons.fixed-bottom-btns');
+        const topbar = document.querySelector('.topbar');
+        const scanText = document.querySelector('.scan-text');
+
+        // visualViewport da la altura real del área visible (sin barra del navegador)
+        const vvh = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
+
+        // Calcular el borde superior: hasta donde llega el último elemento de la UI superior
+        let topOffset = 72; // fallback
+        if (topbar) {
+          const tb = topbar.getBoundingClientRect();
+          topOffset = tb.bottom + 6;
+        }
+        if (scanText) {
+          const st = scanText.getBoundingClientRect();
+          if (st.bottom > topOffset) topOffset = st.bottom + 6;
+        }
+
+        // Calcular el borde inferior: altura real de la botonera
+        let bottomOffset = 170; // fallback (3 filas × ~42px + padding)
+        if (tray) {
+          bottomOffset = tray.getBoundingClientRect().height + 8;
+        }
+
+        frame.style.position = 'fixed';
+        frame.style.top = Math.round(topOffset) + 'px';
+        frame.style.bottom = Math.round(bottomOffset) + 'px';
+        frame.style.left = '10px';
+        frame.style.right = '10px';
+        frame.style.width = 'auto';
+        frame.style.height = 'auto';
+        frame.style.maxWidth = 'none';
+        frame.style.maxHeight = 'none';
+        frame.style.aspectRatio = 'unset';
+        frame.style.transform = 'none';
+        frame.style.zIndex = '5';
+        frame.style.overflow = 'hidden';
+        frame.style.borderRadius = '16px';
+        frame.style.border = '2px solid rgba(255,255,255,0.3)';
+
+        // Re-forzar estilos en video/canvas tras reposicionar
+        frame.querySelectorAll('video, canvas').forEach(applyForceStyles);
       }
 
       // Observar el camera-frame para capturar video/canvas en cuanto MindAR los cree
@@ -289,31 +336,44 @@
             m.addedNodes.forEach((node) => {
               if (node.nodeType !== 1) return;
               if (node.tagName === 'VIDEO' || node.tagName === 'CANVAS') watchElement(node);
-              // también revisar descendientes (a-scene crea jerarquías)
               node.querySelectorAll && node.querySelectorAll('video, canvas').forEach(watchElement);
             });
           });
         });
         frameObs.observe(frame, { childList: true, subtree: true });
-
-        // Aplicar a elementos ya existentes por si acaso
         frame.querySelectorAll('video, canvas').forEach(watchElement);
       }
 
       // ── Detección de orientación ──────────────────────────────────────────────
-      // En móvil real, al girar la pantalla MindAR necesita recalcularse
-      const onOrientationChange = () => {
-        dispatchDelayedResize();
-        // Forzar re-aplicación de estilos
-        if (frame) frame.querySelectorAll('video, canvas').forEach(applyForceStyles);
-      };
+      function onOrientationChange() {
+        // Pequeño delay para que el navegador actualice dimensiones
+        setTimeout(fitCameraFrame, 200);
+        setTimeout(fitCameraFrame, 600);
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 400);
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 1200);
+        if (frame) setTimeout(() => frame.querySelectorAll('video, canvas').forEach(applyForceStyles), 500);
+      }
 
       screen.orientation
         ? screen.orientation.addEventListener('change', onOrientationChange)
         : window.addEventListener('orientationchange', onOrientationChange);
 
-      // ── Resize inicial al cargar ──────────────────────────────────────────────
-      window.addEventListener('load', dispatchDelayedResize);
+      // visualViewport resize: se dispara cuando la barra del navegador se mueve
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => fitCameraFrame());
+      }
+
+      // ── Ajuste al cargar (varias pasadas para esperar a que MindAR arranque) ──
+      window.addEventListener('load', () => {
+        fitCameraFrame();
+        setTimeout(fitCameraFrame, 500);
+        setTimeout(fitCameraFrame, 1500);
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 1200);
+      });
+
+      // También en DOMContentLoaded como primer pase
+      document.addEventListener('DOMContentLoaded', fitCameraFrame);
     })();
 
     document.addEventListener("DOMContentLoaded", () => {
