@@ -2077,6 +2077,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			} catch (e) {
 				console.warn('Error re-registering targets after renderstart', e);
 			}
+			// Recalibrar Mind-AR al nuevo tamaño del contenedor
+			window.dispatchEvent(new Event('resize'));
 		}, { once: true });
 	}
 });

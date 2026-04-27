@@ -566,21 +566,23 @@
 .tutorial-desc { color: #222; }
 
 /* Ajustes específicos para la pantalla de escaneo en móviles */
-@media (max-width: 700px) {
-	/* Centrar la cámara verticalmente en móviles */
+@media (max-width: 768px) {
+	/* Cámara en la parte superior en móviles */
 	.page-scan { position: relative; }
 	.page-scan .camera-frame {
-		position: absolute;
+		position: fixed;
+		top: 56px;
 		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -50%);
-		width: 92vw;
-		max-width: 98vw;
-		max-height: calc(100vh - 180px);
-		aspect-ratio: 16/9;
+		transform: translateX(-50%);
+		width: 90vw;
+		max-width: 90vw;
+		aspect-ratio: 4/3;
+		height: auto;
+		max-height: calc(100vh - 220px);
 		border-width: 4px;
+		border-radius: 14px;
 		margin: 0;
-		z-index: 1;
+		z-index: 5;
 	}
 
 	/* Botonera inferior: hacerla en grid de dos columnas y más compacta */
@@ -614,7 +616,7 @@
 
 /* En pantallas muy pequeñas (<=420px), compactar aún más */
 @media (max-width: 420px) {
-	.page-scan .camera-frame { max-height: calc(100vh - 200px); height: calc(56vw - 4px); }
+	.page-scan .camera-frame { top: 48px; width: 95vw; max-width: 95vw; max-height: calc(100vh - 210px); }
 	.tray-buttons.fixed-bottom-btns { grid-template-columns: 1fr 1fr !important; gap:6px !important; padding: 6px 8px !important; }
 	.tray-buttons.fixed-bottom-btns .cta-btn { font-size: 0.92rem !important; padding: 8px 6px !important; }
 	.help-button { right: 10px; bottom: calc(env(safe-area-inset-bottom, 8px) + 110px); }
@@ -1264,6 +1266,18 @@ h1 {
 	width: 100% !important;
 	height: 100% !important;
 	display: block !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+/* Video inyectado por Mind-AR: siempre cover dentro del frame */
+.camera-frame video {
+	position: absolute !important;
+	top: 0 !important;
+	left: 0 !important;
+	width: 100% !important;
+	height: 100% !important;
+	object-fit: cover !important;
 	margin: 0 !important;
 	padding: 0 !important;
 }
