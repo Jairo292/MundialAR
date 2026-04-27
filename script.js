@@ -433,24 +433,14 @@ function hideScoreSim(idx) {
 	}
 }
 
-function isMobileDevice() {
-	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
 async function startCamera() {
 	if (!scanVideo || !navigator.mediaDevices?.getUserMedia) {
 		return;
 	}
 
-	let videoConstraints = { facingMode: "environment" };
-	// Si es móvil, forzar vertical
-	if (isMobileDevice()) {
-		videoConstraints.aspectRatio = { ideal: 3/4 };
-	}
-
 	try {
 		const stream = await navigator.mediaDevices.getUserMedia({
-			video: videoConstraints,
+			video: { facingMode: "environment" },
 			audio: false,
 		});
 		scanVideo.srcObject = stream;
@@ -462,192 +452,6 @@ async function startCamera() {
 		}
 	}
 }
-
-// Activar simulación si se pasa el query param `?simulate_portrait=1`
-(function applySimulateFromQueryOrSize() {
-	try {
-		const urlParams = new URLSearchParams(window.location.search);
-		const shouldSimParam = urlParams.get('simulate_portrait') === '1';
-
-		function shouldSimBySize() {
-			try {
-				const w = window.innerWidth || document.documentElement.clientWidth;
-				const h = window.innerHeight || document.documentElement.clientHeight;
-				// Condiciones: ancho pequeño (<=420) en orientación portrait OR relación alto/ancho >= 1.6
-				if (w <= 420 && h > w) return true;
-				if (h / Math.max(w, 1) >= 1.6) return true;
-				return false;
-			} catch (e) {
-				return false;
-			}
-		}
-
-		function applySimFlag() {
-			const shouldSim = shouldSimParam || shouldSimBySize();
-			if (shouldSim) document.body.classList.add('simulate-mobile');
-			else document.body.classList.remove('simulate-mobile');
-		}
-
-		// aplicar ahora
-		applySimFlag();
-		// reaplicar al cambiar tamaño (p. ej. DevTools responsive)
-		window.addEventListener('resize', () => {
-			// pequeño debounce
-			clearTimeout(window.__simulateMobileResizeTimer);
-			window.__simulateMobileResizeTimer = setTimeout(applySimFlag, 120);
-		});
-	} catch (e) {
-		// noop
-	}
-})();
-
-// Forzar rotación/escala en videos y canvas de AR cuando estamos en portrait-sim
-function applyPortraitToARMedia() {
-	// Distinguimos simulación (desktop/devtools) de móvil real
-	const urlParams = new URLSearchParams(window.location.search);
-	const simParam = urlParams.get('simulate_portrait') === '1';
-	const isSimView = document.body.classList.contains('simulate-mobile') || simParam || (function(){
-		try { const w = window.innerWidth, h = window.innerHeight; return (w<=420 && h>w) || (h/Math.max(w,1) >= 1.6); } catch(e){return false}
-	})();
-	const isRealMobile = isMobileDevice();
-
-	// If real mobile, DO NOT rotate the stream; just make it cover the camera-frame
-	if (isRealMobile) {
-		const vids = Array.from(document.querySelectorAll('.camera-frame video'));
-		vids.forEach(v => {
-			try {
-				const container = v.closest('.camera-frame');
-				if (!container) return;
-
-				function applyVideoLayout() {
-					try {
-						const cRect = container.getBoundingClientRect();
-						const mediaW = v.videoWidth || v.clientWidth || 1280;
-						const mediaH = v.videoHeight || v.clientHeight || 720;
-						const containerIsPortrait = cRect.height > cRect.width;
-						const mediaIsLandscape = mediaW > mediaH;
-
-						if (mediaIsLandscape && containerIsPortrait) {
-							// Rotate to upright and scale to cover
-							const scaleX = cRect.width / Math.max(mediaH, 1);
-							const scaleY = cRect.height / Math.max(mediaW, 1);
-							const scale = Math.max(scaleX, scaleY, 1);
-							v.style.setProperty('position', 'absolute', 'important');
-							v.style.setProperty('left', '50%', 'important');
-							v.style.setProperty('top', '50%', 'important');
-							v.style.setProperty('transform-origin', 'center center', 'important');
-							v.style.setProperty('transform', `translate(-50%, -50%) rotate(90deg) scale(${scale})`, 'important');
-							v.style.setProperty('width', mediaW + 'px', 'important');
-							v.style.setProperty('height', mediaH + 'px', 'important');
-						} else {
-							// No rotation required: fill container
-							v.style.setProperty('position', 'absolute', 'important');
-							v.style.setProperty('left', '0', 'important');
-							v.style.setProperty('top', '0', 'important');
-							v.style.setProperty('transform', 'none', 'important');
-							v.style.setProperty('width', '100%', 'important');
-							v.style.setProperty('height', '100%', 'important');
-						}
-						v.style.setProperty('object-fit', 'cover', 'important');
-						v.style.setProperty('z-index', '1', 'important');
-						container.style.setProperty('overflow', 'hidden', 'important');
-					} catch (e) { console.warn('applyVideoLayout err', e); }
-				}
-
-				if (v.readyState >= 1 && v.videoWidth) applyVideoLayout();
-				else v.addEventListener('loadedmetadata', applyVideoLayout, { once: true });
-			} catch (e) { console.warn('applyPortraitToARMedia mobile video err', e); }
-		});
-
-		const canv = Array.from(document.querySelectorAll('canvas'));
-		canv.forEach(c => {
-			try {
-				const container = c.closest('.camera-frame') || c.closest('a-scene')?.closest('.camera-frame');
-				if (!container) return;
-				c.style.setProperty('position', 'absolute', 'important');
-				c.style.setProperty('left', '0', 'important');
-				c.style.setProperty('top', '0', 'important');
-				c.style.setProperty('transform', 'none', 'important');
-				c.style.setProperty('width', '100%', 'important');
-				c.style.setProperty('height', '100%', 'important');
-				c.style.setProperty('object-fit', 'cover', 'important');
-				// Canvas debe estar por encima del video de MindAR para que el modelo sea visible
-				c.style.setProperty('z-index', '2', 'important');
-				container.style.setProperty('overflow', 'hidden', 'important');
-			} catch (e) { console.warn('applyPortraitToARMedia mobile canvas err', e); }
-		});
-
-		return;
-	}
-
-	// If simulation view (desktop/devtools), rotate & scale to fill
-	if (isSimView) {
-		const vids = Array.from(document.querySelectorAll('.camera-frame video'));
-		vids.forEach(v => {
-			try {
-				const container = v.closest('.camera-frame');
-				if (!container) return;
-				const cRect = container.getBoundingClientRect();
-				const mediaW = v.videoWidth || v.clientWidth || 1280;
-				const mediaH = v.videoHeight || v.clientHeight || 720;
-				const scaleX = cRect.width / Math.max(mediaH, 1);
-				const scaleY = cRect.height / Math.max(mediaW, 1);
-				const scale = Math.max(scaleX, scaleY, 1);
-				v.style.setProperty('position', 'absolute', 'important');
-				v.style.setProperty('left', '50%', 'important');
-				v.style.setProperty('top', '50%', 'important');
-				v.style.setProperty('transform-origin', 'center center', 'important');
-				v.style.setProperty('transform', `translate(-50%, -50%) rotate(-90deg) scale(${scale})`, 'important');
-				v.style.setProperty('width', mediaW + 'px', 'important');
-				v.style.setProperty('height', mediaH + 'px', 'important');
-				v.style.setProperty('object-fit', 'cover', 'important');
-				v.style.setProperty('z-index', '1', 'important');
-				container.style.setProperty('overflow', 'hidden', 'important');
-			} catch (e) { console.warn('applyPortraitToARMedia video err', e); }
-		});
-
-		const canv = Array.from(document.querySelectorAll('canvas'));
-		canv.forEach(c => {
-			try {
-				const container = c.closest('.camera-frame') || c.closest('a-scene')?.closest('.camera-frame');
-				if (!container) return;
-				const cRect = container.getBoundingClientRect();
-				const mediaW = c.width || c.clientWidth || 1280;
-				const mediaH = c.height || c.clientHeight || 720;
-				const scaleX = cRect.width / Math.max(mediaH, 1);
-				const scaleY = cRect.height / Math.max(mediaW, 1);
-				const scale = Math.max(scaleX, scaleY, 1);
-				c.style.setProperty('position', 'absolute', 'important');
-				c.style.setProperty('left', '50%', 'important');
-				c.style.setProperty('top', '50%', 'important');
-				c.style.setProperty('transform-origin', 'center center', 'important');
-				c.style.setProperty('transform', `translate(-50%, -50%) rotate(-90deg) scale(${scale})`, 'important');
-				c.style.setProperty('width', mediaW + 'px', 'important');
-				c.style.setProperty('height', mediaH + 'px', 'important');
-				c.style.setProperty('object-fit', 'cover', 'important');
-				c.style.setProperty('z-index', '2', 'important');
-				container.style.setProperty('overflow', 'hidden', 'important');
-			} catch (e) { console.warn('applyPortraitToARMedia canvas err', e); }
-		});
-	}
-}
-
-// Observe DOM changes so we can style elements created by MindAR/AFRame
-/*function watchForARMedia() {
-	const observer = new MutationObserver((mutations) => {
-		applyPortraitToARMedia();
-	});
-	observer.observe(document.body, { childList: true, subtree: true });
-	// Also run once on init and on resize
-	applyPortraitToARMedia();
-	window.addEventListener('resize', () => { setTimeout(applyPortraitToARMedia, 120); });
-}
-*/
-// Start watching after DOM ready
-/*
-document.addEventListener('DOMContentLoaded', () => {
-	try { watchForARMedia(); } catch (e) {  noop  }
-});*/
 
 function triggerActiveAnimation() {
 	if (!activeAnimModel) {
@@ -1992,7 +1796,6 @@ function buildModelMapping(countries) {
 			fallbackSrc: defaultFallbackSrc,
 			position: '0 0 -0.5',
 			scale: '80 80 80',
-			scaleMobile: '204 204 204',
 			rotateAnim: true,
 		};
 		const override = overridesByName[countryName] || {};
@@ -2004,46 +1807,6 @@ function buildModelMapping(countries) {
 // Mapping from targetIndex -> model configuration. Each target uses its own .glb
 // file stored inside the `assets` folder.
 const modelMapping = buildModelMapping(targetCountries);
-// Debug helper: when true, add a simple visible primitive to targets on detection
-const DEBUG_FALLBACK_BOX = true;
-
-// UI banner for model load/debug messages (visible on mobile without console)
-function showModelDebugBanner(msg, type = 'info', timeout = 6000) {
-	try {
-		let el = document.getElementById('model-debug-banner');
-		if (!el) {
-			el = document.createElement('div');
-			el.id = 'model-debug-banner';
-			el.style.position = 'fixed';
-			el.style.right = '12px';
-			el.style.top = '12px';
-			el.style.zIndex = '9999';
-			el.style.padding = '10px 14px';
-			el.style.borderRadius = '10px';
-			el.style.fontFamily = 'system-ui, Arial, sans-serif';
-			el.style.fontSize = '13px';
-			el.style.boxShadow = '0 6px 18px rgba(0,0,0,0.35)';
-			document.body.appendChild(el);
-		}
-		el.textContent = msg;
-		if (type === 'error') {
-			el.style.background = 'linear-gradient(135deg,#ff6666,#ff4444)';
-			el.style.color = '#fff';
-		} else if (type === 'success') {
-			el.style.background = 'linear-gradient(135deg,#44cc88,#26a65b)';
-			el.style.color = '#042';
-		} else {
-			el.style.background = 'linear-gradient(135deg,#2b3942,#1f6f8b)';
-			el.style.color = '#fff';
-		}
-		if (timeout > 0) {
-			clearTimeout(window.__modelDebugBannerTimeout);
-			window.__modelDebugBannerTimeout = setTimeout(() => {
-				try { el.remove(); } catch (e) {}
-			}, timeout);
-		}
-	} catch (e) { /* noop */ }
-}
 
 function createModelNode(cfg, index) {
 	let node;
@@ -2114,46 +1877,12 @@ function registerDynamicTargets() {
 			if (!cfg) return;
 			t._modelName = (cfg.name || '').toString().trim();
 			const modelNode = createModelNode(cfg, idx);
-			// If running on a real mobile device, adjust scale/position so model is visible
-			if (isMobileDevice()) {
-				try {
-					// prefer cfg.mobile overrides if provided; fall back to the same scale as desktop
-					const mobileScale = cfg.scaleMobile || cfg.scale || '80 80 80';
-					const mobilePos = cfg.positionMobile || cfg.position || '0 0 -0.5';
-					modelNode.setAttribute('scale', mobileScale);
-					modelNode.setAttribute('position', mobilePos);
-				} catch (e) { /* noop */ }
-			}
 			t.appendChild(modelNode);
 			t._modelAdded = modelNode;
-			// Debug fallback: append a visible box immediately on targetFound so we can
-			// confirm the scene is rendering even if the .glb fails to load.
-			if (DEBUG_FALLBACK_BOX && !t._debugBox) {
-				try {
-					const dbg = document.createElement('a-box');
-					dbg.setAttribute('color', '#ff4444');
-					dbg.setAttribute('depth', '0.25');
-					dbg.setAttribute('height', '0.25');
-					dbg.setAttribute('width', '0.25');
-					dbg.setAttribute('position', '0 0 -0.2');
-					dbg.setAttribute('id', `debug-box-${idx}`);
-					t.appendChild(dbg);
-					t._debugBox = dbg;
-					console.info('Debug box (immediate) appended for target', idx);
-				} catch (e) { console.warn('Could not append immediate debug box', e); }
-			}
-			// Log model load errors for debugging on mobile
-			try {
-				modelNode.addEventListener('model-error', (ev) => {
-					console.error('Model error for target', idx, 'src:', cfg.src, ev);
-				});
-			} catch (e) {}
 			// If config has a specific clip, update the entity's data-anim-clip attribute
 			if (cfg.clip) {
 				t.setAttribute('data-anim-clip', cfg.clip);
 			}
-			// Show loading banner so user sees model fetch started
-			try { showModelDebugBanner(`Cargando modelo: ${cfg.src}`, 'info', 0); } catch (e) {}
 			// If config specifies rotation animation, set the data-rotate-anim flag
 			if (cfg.rotateAnim) {
 				t.setAttribute('data-rotate-anim', 'true');
@@ -2170,26 +1899,9 @@ function registerDynamicTargets() {
 				if (cfg.texture) {
 					applyTextureToModel(modelNode, cfg.texture);
 				}
-				// On model loaded, show success banner briefly
-				try { showModelDebugBanner(`Modelo cargado: ${cfg.name || idx}`, 'success', 3000); } catch (e) {}
 				if (visualEffectsEnabled) {
 					removeVisualEffectFromTarget(t);
 					applyVisualEffectToTarget(t);
-				}
-				// Debug fallback: append a visible box so we can confirm A-Frame renders on mobile
-				if (DEBUG_FALLBACK_BOX) {
-					try {
-						const box = document.createElement('a-box');
-						box.setAttribute('color', '#ff4444');
-						box.setAttribute('depth', '0.2');
-						box.setAttribute('height', '0.2');
-						box.setAttribute('width', '0.2');
-						box.setAttribute('position', '0 0 -0.2');
-						box.setAttribute('id', `debug-box-${idx}`);
-						t.appendChild(box);
-						t._debugBox = box;
-						console.info('Debug box appended for target', idx);
-					} catch (e) { console.warn('Could not append debug box', e); }
 				}
 			}, { once: true });
 			if (visualEffectsEnabled) {
@@ -2223,11 +1935,6 @@ function registerDynamicTargets() {
 						animationButton.classList.remove("is-active");
 					}
 					updateVideoButtonState();
-				}
-				// remove debug box if present
-				if (t._debugBox) {
-					try { t._debugBox.remove(); } catch (e) {}
-					t._debugBox = null;
 				}
 				if (activeTargetIndex === idx) {
 					activeTargetIndex = null;
